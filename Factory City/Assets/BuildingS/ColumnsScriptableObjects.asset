@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee95fe36c94ec3d469416125147f470d, type: 3}
+  m_Name: ColumnsScriptableObjects
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 2217255550776482875, guid: ea96ff3030ad46841b8e671ed23c74ac, type: 3}
+  visual: {fileID: 6205091644354308179, guid: bd8f97c05219faf4abe620eef40658a0, type: 3}
+  dimention: {x: 0.1, y: 4, z: 0.1}
+  columnName: Column 4
