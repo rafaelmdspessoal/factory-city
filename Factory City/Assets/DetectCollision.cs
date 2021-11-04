@@ -8,7 +8,7 @@ public class DetectCollision : MonoBehaviour
 
     private void OnTriggerEnter(Collider collider)
     {
-        if (collider.gameObject.layer == 7)
+        if (collider.gameObject.layer != 0)
         {
             collided = true;
         }

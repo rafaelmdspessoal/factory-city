@@ -9,9 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4fb1ad6aa60ff784fa019cfc90f0f9d2, type: 3}
-  m_Name: PlatformsScriptableObject
+  m_Script: {fileID: 11500000, guid: ee95fe36c94ec3d469416125147f470d, type: 3}
+  m_Name: PlatformScriptableObjects
   m_EditorClassIdentifier: 
   prefab: {fileID: 4226255195269961770, guid: 115f02b431028e440a3b3c17f2248691, type: 3}
   visual: {fileID: 4226255195269961770, guid: a001dee2286c2d1428e04c5627dd54c1, type: 3}
-  platformName: 10x100x100
+  dimention: {x: 1, y: 0.1, z: 1}
+  columnName: Platform 10x100x100
