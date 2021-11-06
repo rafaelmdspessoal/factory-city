@@ -15,4 +15,6 @@ MonoBehaviour:
   prefab: {fileID: 2106882994946784591, guid: 115f02b431028e440a3b3c17f2248691, type: 3}
   visual: {fileID: 8329102595451250992, guid: a001dee2286c2d1428e04c5627dd54c1, type: 3}
   dimention: {x: 1, y: 0.1, z: 1}
+  currentDimention: {x: 1, y: 0.1, z: 1}
   columnName: Platform 10x100x100
+  buildingRotation: 2

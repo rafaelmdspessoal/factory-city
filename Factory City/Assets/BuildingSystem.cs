@@ -49,6 +49,7 @@ public class BuildingSystem : MonoBehaviour
             }
 
             ChooseSnap();
+            RotateSelectedObject(visual.GetChild(0));
             canBuild = CanBuild(visual);
 
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -61,7 +62,7 @@ public class BuildingSystem : MonoBehaviour
                 test.position = mousePos;
                 Vector3 hitObjPos = hitTransform.position;
                 Vector3 hitObjScale = hitTransform.localScale;
-                Vector3 dimentions = buildingScriptableObject.dimention;
+                Vector3 dimentions = buildingScriptableObject.currentDimention;
                 Vector3 hitObjectNormal = raycastHit.normal;
 
                 Vector3 dir = (mousePos - hitObjPos);
@@ -78,11 +79,26 @@ public class BuildingSystem : MonoBehaviour
                             if (Mathf.Abs(dir.x) > Mathf.Abs(dir.z)) { dir.z = 0; } else { dir.x = 0; }
                             dir = dir.normalized;
                             hitObjPos.y = hitObjPos.y - (hitTransform.localScale.y / 2 );
-                            Vector3 offset = new Vector3(
-                                dimentions.x + hitTransform.localScale.x, 
+
+                            float hitTransformRotation = Mathf.Deg2Rad * hitTransform.rotation.eulerAngles.y;
+                            float cosRot = Mathf.RoundToInt(Mathf.Cos(hitTransformRotation));
+                            float sinRot = Mathf.RoundToInt(Mathf.Sin(hitTransformRotation));
+
+                            Vector3 hitObjectDimention = new Vector3(
+                                Mathf.Abs((hitObjScale.x * cosRot) - (hitObjScale.z * sinRot)),
                                 0,
-                                dimentions.z + hitTransform.localScale.z
-                                ) / 2;
+                                Mathf.Abs((hitObjScale.x * sinRot) + (hitObjScale.z * cosRot))
+                            );
+                            print("rot");
+                            print(hitTransformRotation);
+                            print("Sinrot");
+                            print(sinRot);
+                            print(Mathf.Sign(Mathf.Deg2Rad * hitTransform.rotation.eulerAngles.y));
+                            print("Cosrot");
+                            print(cosRot);
+                            print("Dim");
+                            print(hitObjectDimention);
+                            Vector3 offset = (dimentions + hitObjectDimention) / 2;
 
                             mousePos.x = offset.x * dir.x;
                             mousePos.y = offset.y * dir.y;
@@ -142,7 +158,7 @@ public class BuildingSystem : MonoBehaviour
             {
                 if (canBuild)
                 {
-                    GetSelectedObjectPrefab(buildingScriptableObject, visualsPos, visual.rotation);
+                    GetSelectedObjectPrefab(buildingScriptableObject, visualsPos, visual.GetChild(0).rotation);
                 }
                 else
                 {
@@ -159,7 +175,8 @@ public class BuildingSystem : MonoBehaviour
 
     public Transform GetSelectedObjectPrefab(BuildingsScriptableObjects obj, Vector3 pos, Quaternion rot)
     {
-        Transform prefab = Instantiate(obj.prefab, pos, rot);
+        Transform prefab = Instantiate(obj.prefab, pos, Quaternion.identity);
+        prefab.GetChild(0).rotation = rot;
         return prefab;
     }
 
@@ -195,6 +212,15 @@ public class BuildingSystem : MonoBehaviour
             case PositionSnap.Four:
                 snapValue = 4;
                 break;
+        }
+    }
+
+    void RotateSelectedObject(Transform visualObj)
+    {
+        if (Input.GetKeyDown(KeyCode.R) && visualObj != null)
+        {
+            buildingScriptableObject.GetNextRotation(visualObj);
+            print(buildingScriptableObject.buildingRotation);
         }
     }
 
