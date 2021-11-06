@@ -27,18 +27,16 @@ public class BuildingTypes : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Alpha1))
             { 
-                buildingType = BuildingType.Platforms;    
-                print("one");
+                buildingType = BuildingType.Platforms;
+                BuildingSystem.Instance.UnsetSelectedObject();
+                print("Platform");
             }
             if (Input.GetKeyDown(KeyCode.Alpha2))
             {
                 buildingType = BuildingType.Columns;
-                print("two");
+                BuildingSystem.Instance.UnsetSelectedObject();
+                print("Column");
             }
-        }
-        else
-        {
-            print("Not building!");
         }
     }
 }

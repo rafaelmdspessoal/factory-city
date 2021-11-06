@@ -8,12 +8,8 @@ public class SelectBuildingType : MonoBehaviour
     [SerializeField] private GameObject[] platformsBtn;
     [SerializeField] private GameObject[] columnsBtn;
 
-    private GameObject player;
-
     private void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player");
-
         notBuildingBtn.SetActive(false);
         foreach (GameObject platformBtn in platformsBtn)
         {
@@ -30,7 +26,7 @@ public class SelectBuildingType : MonoBehaviour
         if (CharacterStates.Instance.state == CharacterStates.State.Building)
         {
             if (Input.GetKey(KeyCode.Q))
-            {
+            {                
                 Cursor.lockState = CursorLockMode.Confined;
                 Cursor.visible = true;
                 if (BuildingTypes.Instance.buildingType == BuildingTypes.BuildingType.Platforms)

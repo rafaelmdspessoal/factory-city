@@ -178,6 +178,27 @@ namespace CodeMonkey.Utils {
             return goRectTransform;
         }
 
+        public static Text DrawTextUIPopup(string textString, Vector2 anchoredPosition, int fontSize, Font font, float popupTime = 1f)
+        {
+            Text text = DrawTextUI(textString, GetCanvasTransform(), anchoredPosition, fontSize, font);
+            Transform transform = text.transform;
+            Vector3 moveAmount = Vector3.up * 10;
+            FunctionUpdater.Create(delegate () {
+                transform.position += moveAmount * Time.unscaledDeltaTime;
+                popupTime -= Time.unscaledDeltaTime;
+                if (popupTime <= 0f)
+                {
+                    UnityEngine.Object.Destroy(transform.gameObject);
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }, "DrawTextUIPopup");
+            return text;
+        }
+
         public static Text DrawTextUI(string textString, Vector2 anchoredPosition, int fontSize, Font font) {
             return DrawTextUI(textString, GetCanvasTransform(), anchoredPosition, fontSize, font);
         }
@@ -206,9 +227,8 @@ namespace CodeMonkey.Utils {
             return text;
         }
 
-
         // Parse a float, return default if failed
-	    public static float Parse_Float(string txt, float _default) {
+        public static float Parse_Float(string txt, float _default) {
 		    float f;
 		    if (!float.TryParse(txt, out f)) {
 			    f = _default;

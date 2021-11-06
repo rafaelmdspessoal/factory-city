@@ -42,7 +42,12 @@ public class BuildingSystem : MonoBehaviour
     {       
         if (CharacterStates.Instance.state == CharacterStates.State.Building)
         {
-            if (visual == null) { canBuild = true; return; }
+            if (visual == null || UtilsClass.IsPointerOverUI()) {
+                canBuild = false;
+                print("Can't build");
+                return;             
+            }
+
             ChooseSnap();
             canBuild = CanBuild(visual);
 
@@ -141,7 +146,11 @@ public class BuildingSystem : MonoBehaviour
                 }
                 else
                 {
-                    UtilsClass.CreateWorldTextPopup(buildingScriptableObject.name, visualsPos);
+                    UtilsClass.DrawTextUIPopup(
+                        buildingScriptableObject.name,
+                        Vector2.zero,
+                        20,
+                        null);
                 }
             }
         }
@@ -159,6 +168,12 @@ public class BuildingSystem : MonoBehaviour
         if (visual != null) { Destroy(visual.gameObject); }
         buildingScriptableObject = obj;
         visual = Instantiate(buildingScriptableObject.visual);
+    }
+
+    public void UnsetSelectedObject()
+    {
+        if (visual != null) { Destroy(visual.gameObject); }
+        buildingScriptableObject = null;
     }
 
     void ChooseSnap()
