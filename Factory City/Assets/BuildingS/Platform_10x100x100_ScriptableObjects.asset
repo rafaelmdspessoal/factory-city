@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ee95fe36c94ec3d469416125147f470d, type: 3}
-  m_Name: ColumnsScriptableObjects
+  m_Name: Platform_10x100x100_ScriptableObjects
   m_EditorClassIdentifier: 
-  prefab: {fileID: 8090991714112172160, guid: ea96ff3030ad46841b8e671ed23c74ac, type: 3}
-  visual: {fileID: 1214396520656669082, guid: bd8f97c05219faf4abe620eef40658a0, type: 3}
-  dimention: {x: 0.1, y: 4, z: 0.1}
-  columnName: Column 4
+  prefab: {fileID: 2106882994946784591, guid: 115f02b431028e440a3b3c17f2248691, type: 3}
+  visual: {fileID: 8329102595451250992, guid: a001dee2286c2d1428e04c5627dd54c1, type: 3}
+  dimention: {x: 1, y: 0.1, z: 1}
+  columnName: Platform 10x100x100
