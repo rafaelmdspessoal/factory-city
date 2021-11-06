@@ -5,13 +5,12 @@ using CodeMonkey.Utils;
 
 public class BuildingSystem : MonoBehaviour
 {
+    public static BuildingSystem Instance { get; private set; }
+
     [SerializeField] private LayerMask mouseColliderLayerMask = new LayerMask();
-    [SerializeField] private List<BuildingsScriptableObjects> buildingScriptableObjectList;
     [SerializeField] private PositionSnap posistionSnap;
-    [SerializeField] private BuildingType buildingType;
 
     private BuildingsScriptableObjects buildingScriptableObject;
-    private State state;
 
     private float snapValue;
     private Transform visual;
@@ -19,6 +18,8 @@ public class BuildingSystem : MonoBehaviour
     private Vector3 visualsPos = Vector3.zero;
     private Vector3 mousePos = Vector3.zero;
     private Vector3 objectOffset = Vector3.zero;
+
+    private bool canBuild;
 
     public Transform test;
 
@@ -31,31 +32,19 @@ public class BuildingSystem : MonoBehaviour
         Four,
     };
 
-    private enum State
-    {
-        Building,
-        NotBuilding,
-    };
 
-    private enum BuildingType
+    void Awake()
     {
-        Platforms,
-        Walls,
-        Columns,
-    };
-
-    void Start()
-    {
-        state = State.NotBuilding;
+        Instance = this;
     }
 
     void Update()
-    {
-        ChooseState();
-        if (state == State.Building)
+    {       
+        if (CharacterStates.Instance.state == CharacterStates.State.Building)
         {
+            if (visual == null) { canBuild = true; return; }
             ChooseSnap();
-            bool canBuild = CanBuild(visual);
+            canBuild = CanBuild(visual);
 
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit raycastHit;
@@ -64,47 +53,78 @@ public class BuildingSystem : MonoBehaviour
                 mousePos = raycastHit.point;
                 Transform hitTransform = raycastHit.transform;
                 LayerMask layer = raycastHit.transform.gameObject.layer;
-                Vector3 normalHit = raycastHit.normal;
                 test.position = mousePos;
+                Vector3 hitObjPos = hitTransform.position;
+                Vector3 hitObjScale = hitTransform.localScale;
+                Vector3 dimentions = buildingScriptableObject.dimention;
+                Vector3 hitObjectNormal = raycastHit.normal;
 
-                switch (buildingType)
+                Vector3 dir = (mousePos - hitObjPos);
+                switch (BuildingTypes.Instance.buildingType)
                 {
-                    case BuildingType.Platforms:
+                    case BuildingTypes.BuildingType.Platforms:
                         if (layer != 7 && layer != 8 && layer != 9) {
                             canBuild = false;
                             break;
                         }
-                        if (layer == 7 && normalHit.y >= -0.01f && normalHit.y <= 0.01f)
+                        if (layer == 7)
                         {
-                            Vector3 normalDist = (mousePos - hitTransform.position);
-                            mousePos.x += normalHit.x / 2;
-                            mousePos.y += normalHit.y / 2;
-                            mousePos.z += normalHit.z / 2;
+                            dir.y = 0;
+                            if (Mathf.Abs(dir.x) > Mathf.Abs(dir.z)) { dir.z = 0; } else { dir.x = 0; }
+                            dir = dir.normalized;
+                            hitObjPos.y = hitObjPos.y - (hitTransform.localScale.y / 2 );
+                            Vector3 offset = new Vector3(
+                                dimentions.x + hitTransform.localScale.x, 
+                                0,
+                                dimentions.z + hitTransform.localScale.z
+                                ) / 2;
+
+                            mousePos.x = offset.x * dir.x;
+                            mousePos.y = offset.y * dir.y;
+                            mousePos.z = offset.z * dir.z;
+
+                            visualsPos = mousePos + hitObjPos;
                         }
                         else if (layer == 8)
                         {
-                            print("xuxa");
+                            if (Mathf.Abs(hitObjectNormal.y) > 0.1)
+                            {
+                                if (dir.x > 0.3f) { visualsPos.x = hitObjPos.x + dimentions.x / 2; }
+                                else if (dir.x < -0.3f) { visualsPos.x = hitObjPos.x - dimentions.x / 2; }
+                                else { visualsPos.x = hitObjPos.x; }
 
+                                if (dir.z > 0.3f) { visualsPos.z = hitObjPos.z + dimentions.z / 2; }
+                                else if (dir.z < -0.3f) { visualsPos.z = hitObjPos.z - dimentions.z / 2; }
+                                else { visualsPos.z = hitObjPos.z; }
+                            }
+
+                            visualsPos.y = hitObjPos.y * 2 - dimentions.y;
                         }
                         else if (layer == 9)
                         {
-                            print("xuxa");
+                            visualsPos = new Vector3(
+                                Mathf.RoundToInt(mousePos.x),
+                                Mathf.RoundToInt(mousePos.y),
+                                Mathf.RoundToInt(mousePos.z)
+                            );
                         }
                         break;
-                    case BuildingType.Columns:
+                    case BuildingTypes.BuildingType.Columns:
                         if (layer != 7) 
                         { 
                             canBuild = false;
                             break;
                         }
+                        visualsPos.y = hitObjScale.y;
+                        if (dir.x >= 0.25f) { visualsPos.x = hitObjPos.x + hitObjScale.x / 2; }
+                        else if (dir.x <= -0.25f) { visualsPos.x = hitObjPos.x - hitObjScale.x / 2; }
+                        else { visualsPos.x = hitObjPos.x; }
+
+                        if (dir.z >= 0.25f) { visualsPos.z = hitObjPos.z + hitObjScale.z / 2; }
+                        else if (dir.z <= -0.25f) { visualsPos.z = hitObjPos.z - hitObjScale.z / 2; }
+                        else { visualsPos.z = hitObjPos.z; }
                         break;
-                }                
-                visualsPos = new Vector3(
-                   Mathf.RoundToInt(mousePos.x), 
-                    Mathf.RoundToInt(mousePos.y), 
-                    Mathf.RoundToInt(mousePos.z)
-                );
-                
+                }        
 
                 visual.position = visualsPos;
             }
@@ -117,7 +137,7 @@ public class BuildingSystem : MonoBehaviour
             {
                 if (canBuild)
                 {
-                    Instantiate(buildingScriptableObject.prefab, visualsPos, visual.rotation);
+                    GetSelectedObjectPrefab(buildingScriptableObject, visualsPos, visual.rotation);
                 }
                 else
                 {
@@ -128,44 +148,16 @@ public class BuildingSystem : MonoBehaviour
        
     }
 
-    void ChooseState()
+    public Transform GetSelectedObjectPrefab(BuildingsScriptableObjects obj, Vector3 pos, Quaternion rot)
     {
-        if (Input.GetKeyDown("1"))
-        {
-            if (visual != null) { Destroy(visual.gameObject); }
-
-            state = State.Building;
-            buildingType = BuildingType.Platforms;
-            ChooseBuildingType();
-            print("one");
-        }
-        if (Input.GetKeyDown("2"))
-        {
-            if (visual != null) { Destroy(visual.gameObject); }
-            state = State.Building;
-            buildingType = BuildingType.Columns;
-            ChooseBuildingType();
-            print("one");
-        }
-        else if (Input.GetKeyDown("3"))
-        {
-            print("two");
-            if (visual != null) { Destroy(visual.gameObject); }
-            state = State.NotBuilding;
-        }
+        Transform prefab = Instantiate(obj.prefab, pos, rot);
+        return prefab;
     }
 
-    void ChooseBuildingType()
+    public void SetSelectedObject(BuildingsScriptableObjects obj)
     {
-        switch (buildingType)
-        {
-            case BuildingType.Platforms:
-                buildingScriptableObject = buildingScriptableObjectList[0];
-                break;
-            case BuildingType.Columns:
-                buildingScriptableObject = buildingScriptableObjectList[1];
-                break;
-        }
+        if (visual != null) { Destroy(visual.gameObject); }
+        buildingScriptableObject = obj;
         visual = Instantiate(buildingScriptableObject.visual);
     }
 
