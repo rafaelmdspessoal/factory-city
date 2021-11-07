@@ -21,8 +21,6 @@ public class BuildingSystem : MonoBehaviour
 
     private bool canBuild;
 
-    public Transform test;
-
     private enum PositionSnap
     {
         Half,
@@ -40,89 +38,61 @@ public class BuildingSystem : MonoBehaviour
 
     void Update()
     {       
-        if (CharacterStates.Instance.state == CharacterStates.State.Building)
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit raycastHit;
+        if (CharacterStates.Instance.state == CharacterStates.State.Demolishing)
         {
-            if (visual == null || UtilsClass.IsPointerOverUI()) {
+            if (UtilsClass.IsPointerOverUI())
+            {
+                return;
+            }
+            if (Input.GetMouseButtonDown(0))
+            {
+                if (Physics.Raycast(ray, out raycastHit, 999f, mouseColliderLayerMask))
+                {
+                    Transform hitTransform = raycastHit.transform;
+                    IManipulable manipulableObj = hitTransform.GetComponent<IManipulable>();
+
+                    if (manipulableObj != null) { manipulableObj.DestroySelf(); }                    
+                }
+            }
+        }
+        else if (CharacterStates.Instance.state == CharacterStates.State.Building)
+        {
+            if (visual == null || UtilsClass.IsPointerOverUI())
+            {
                 canBuild = false;
-                print("Can't build");
-                return;             
+                return;
             }
 
             ChooseSnap();
-            RotateSelectedObject(visual.GetChild(0));
+            RotateSelectedObject(buildingScriptableObject, visual);
             canBuild = CanBuild(visual);
 
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit raycastHit;
             if (Physics.Raycast(ray, out raycastHit, 999f, mouseColliderLayerMask))
             {
                 mousePos = raycastHit.point;
                 Transform hitTransform = raycastHit.transform;
                 LayerMask layer = raycastHit.transform.gameObject.layer;
-                test.position = mousePos;
-                Vector3 hitObjPos = hitTransform.position;
-                Vector3 hitObjScale = hitTransform.localScale;
-                Vector3 dimentions = buildingScriptableObject.currentDimention;
-                Vector3 hitObjectNormal = raycastHit.normal;
 
-                Vector3 dir = (mousePos - hitObjPos);
                 switch (BuildingTypes.Instance.buildingType)
                 {
                     case BuildingTypes.BuildingType.Platforms:
-                        if (layer != 7 && layer != 8 && layer != 9) {
+                        if (layer != 7 && layer != 8 && layer != 9)
+                        {
                             canBuild = false;
                             break;
                         }
                         if (layer == 7)
                         {
-                            dir.y = 0;
-                            if (Mathf.Abs(dir.x) > Mathf.Abs(dir.z)) { dir.z = 0; } else { dir.x = 0; }
-                            dir = dir.normalized;
-                            hitObjPos.y = hitObjPos.y - (hitTransform.localScale.y / 2 );
-
-                            float hitTransformRotation = Mathf.Deg2Rad * hitTransform.rotation.eulerAngles.y;
-                            float cosRot = Mathf.RoundToInt(Mathf.Cos(hitTransformRotation));
-                            float sinRot = Mathf.RoundToInt(Mathf.Sin(hitTransformRotation));
-
-                            Vector3 hitObjectDimention = new Vector3(
-                                Mathf.Abs((hitObjScale.x * cosRot) - (hitObjScale.z * sinRot)),
-                                0,
-                                Mathf.Abs((hitObjScale.x * sinRot) + (hitObjScale.z * cosRot))
-                            );
-                            print("rot");
-                            print(hitTransformRotation);
-                            print("Sinrot");
-                            print(sinRot);
-                            print(Mathf.Sign(Mathf.Deg2Rad * hitTransform.rotation.eulerAngles.y));
-                            print("Cosrot");
-                            print(cosRot);
-                            print("Dim");
-                            print(hitObjectDimention);
-                            Vector3 offset = (dimentions + hitObjectDimention) / 2;
-
-                            mousePos.x = offset.x * dir.x;
-                            mousePos.y = offset.y * dir.y;
-                            mousePos.z = offset.z * dir.z;
-
-                            visualsPos = mousePos + hitObjPos;
+                            visualsPos = GetPlatformPositionToBuildPlatform(hitTransform, mousePos);
                         }
                         else if (layer == 8)
                         {
-                            if (Mathf.Abs(hitObjectNormal.y) > 0.1)
-                            {
-                                if (dir.x > 0.3f) { visualsPos.x = hitObjPos.x + dimentions.x / 2; }
-                                else if (dir.x < -0.3f) { visualsPos.x = hitObjPos.x - dimentions.x / 2; }
-                                else { visualsPos.x = hitObjPos.x; }
-
-                                if (dir.z > 0.3f) { visualsPos.z = hitObjPos.z + dimentions.z / 2; }
-                                else if (dir.z < -0.3f) { visualsPos.z = hitObjPos.z - dimentions.z / 2; }
-                                else { visualsPos.z = hitObjPos.z; }
-                            }
-
-                            visualsPos.y = hitObjPos.y * 2 - dimentions.y;
+                            visualsPos = GetColumnPositionToBuildPlatform(hitTransform, mousePos);
                         }
                         else if (layer == 9)
-                        {
+                        {  
                             visualsPos = new Vector3(
                                 Mathf.RoundToInt(mousePos.x),
                                 Mathf.RoundToInt(mousePos.y),
@@ -131,21 +101,14 @@ public class BuildingSystem : MonoBehaviour
                         }
                         break;
                     case BuildingTypes.BuildingType.Columns:
-                        if (layer != 7) 
-                        { 
+                        if (layer != 7)
+                        {
                             canBuild = false;
                             break;
                         }
-                        visualsPos.y = hitObjScale.y;
-                        if (dir.x >= 0.25f) { visualsPos.x = hitObjPos.x + hitObjScale.x / 2; }
-                        else if (dir.x <= -0.25f) { visualsPos.x = hitObjPos.x - hitObjScale.x / 2; }
-                        else { visualsPos.x = hitObjPos.x; }
-
-                        if (dir.z >= 0.25f) { visualsPos.z = hitObjPos.z + hitObjScale.z / 2; }
-                        else if (dir.z <= -0.25f) { visualsPos.z = hitObjPos.z - hitObjScale.z / 2; }
-                        else { visualsPos.z = hitObjPos.z; }
+                        visualsPos = GetPlatformPositionToBuildColumn(hitTransform, mousePos);
                         break;
-                }        
+                }
 
                 visual.position = visualsPos;
             }
@@ -158,7 +121,7 @@ public class BuildingSystem : MonoBehaviour
             {
                 if (canBuild)
                 {
-                    GetSelectedObjectPrefab(buildingScriptableObject, visualsPos, visual.GetChild(0).rotation);
+                    CreateSelectedObjectPrefab(buildingScriptableObject, visualsPos, visual.GetChild(0).rotation);
                 }
                 else
                 {
@@ -173,17 +136,106 @@ public class BuildingSystem : MonoBehaviour
        
     }
 
-    public Transform GetSelectedObjectPrefab(BuildingsScriptableObjects obj, Vector3 pos, Quaternion rot)
+    private Vector3 GetColumnPositionToBuildPlatform(Transform referenceObject, Vector3 mousePosition)
+    {
+        Vector3 hitObjPos = referenceObject.position;
+        Vector3 objHitPos = (mousePosition - hitObjPos);
+        Vector3 selectedObjDimentions = buildingScriptableObject.currentDimention;
+        Vector3 hitObjScale = referenceObject.localScale;
+        Vector3 finalPosition = hitObjPos;
+
+        Vector3 offset = new Vector3(
+            selectedObjDimentions.x,
+            selectedObjDimentions.y / 2 + hitObjScale.y,
+            selectedObjDimentions.z
+            ) / 2;            
+
+        if (objHitPos.x > 0.2f) { finalPosition.x += offset.x; }
+        else if (objHitPos.x < -0.2f) { finalPosition.x -= offset.x; }
+
+        if (objHitPos.z > 0.2f) { finalPosition.z += offset.z; }
+        else if (objHitPos.z < -0.2f) { finalPosition.z -= offset.z; }
+
+        finalPosition.y += offset.y;
+
+        return finalPosition;
+    }
+
+    private Vector3 GetPlatformPositionToBuildColumn(Transform referenceObject, Vector3 mousePosition)
+    {
+        Vector3 hitObjPos = referenceObject.position;
+        Vector3 objHitPos = (mousePosition - hitObjPos);
+        Vector3 hitObjRot = referenceObject.rotation.eulerAngles;
+        Vector3 hitObjScale = referenceObject.localScale;
+        Vector3 finalPosition = hitObjPos;
+
+        Vector3 hitObjectDimention = GetRotateObjectDimention(hitObjScale, hitObjRot);
+
+        Vector3 offset = hitObjectDimention / 2;
+
+
+        if (objHitPos.x > 0.2f) { finalPosition.x += offset.x; }
+        else if (objHitPos.x < -0.2f) { finalPosition.x -= offset.x; }
+
+        if (objHitPos.z > 0.2f) { finalPosition.z += offset.z; }
+        else if (objHitPos.z < -0.2f) { finalPosition.z -= offset.z; }
+
+        finalPosition.y += offset.y;
+
+        return finalPosition;
+    }
+
+    private Vector3 GetPlatformPositionToBuildPlatform(Transform referenceObject, Vector3 mousePosition)
+    {     
+        Vector3 hitObjPos = referenceObject.position;
+        Vector3 objHitPos = (mousePosition - hitObjPos);
+        Vector3 selectedObjDimentions = buildingScriptableObject.currentDimention;
+        Vector3 hitObjScale = referenceObject.localScale;
+        Vector3 hitObjRot = referenceObject.rotation.eulerAngles;
+
+        objHitPos.y = 0;
+        if (Mathf.Abs(objHitPos.x) > Mathf.Abs(objHitPos.z)) { objHitPos.z = 0; } else { objHitPos.x = 0; }
+        objHitPos = objHitPos.normalized;
+        hitObjPos.y = hitObjPos.y - (hitObjScale.y / 2);
+
+        Vector3 hitObjectDimention = GetRotateObjectDimention(hitObjScale, hitObjRot);
+
+        Vector3 offset = (selectedObjDimentions + hitObjectDimention) / 2;
+
+        Vector3 finalPosition = hitObjPos;
+        finalPosition.x += offset.x * objHitPos.x;
+        finalPosition.y += offset.y * objHitPos.y;
+        finalPosition.z += offset.z * objHitPos.z;
+
+        return finalPosition;
+    }
+
+    private Vector3 GetRotateObjectDimention(Vector3 objDimention, Vector3 objRotation)
+    {
+        float hitTransformRotation = Mathf.Deg2Rad * objRotation.y;
+        float cosRot = Mathf.RoundToInt(Mathf.Cos(hitTransformRotation));
+        float sinRot = Mathf.RoundToInt(Mathf.Sin(hitTransformRotation));
+
+        Vector3 rotatedObjectDimention = new Vector3(
+            Mathf.Abs((objDimention.x * cosRot) - (objDimention.z * sinRot)),
+            0,
+            Mathf.Abs((objDimention.x * sinRot) + (objDimention.z * cosRot))
+        );
+
+        return rotatedObjectDimention;
+    }
+
+    public void CreateSelectedObjectPrefab(BuildingsScriptableObjects obj, Vector3 pos, Quaternion rot)
     {
         Transform prefab = Instantiate(obj.prefab, pos, Quaternion.identity);
         prefab.GetChild(0).rotation = rot;
-        return prefab;
+        prefab.GetChild(0).GetComponent<IManipulable>().CreateSelf();
     }
 
-    public void SetSelectedObject(BuildingsScriptableObjects obj)
+    public void SetSelectedObject(BuildingsScriptableObjects selectedSO)
     {
         if (visual != null) { Destroy(visual.gameObject); }
-        buildingScriptableObject = obj;
+        buildingScriptableObject = selectedSO;
         visual = Instantiate(buildingScriptableObject.visual);
     }
 
@@ -215,12 +267,11 @@ public class BuildingSystem : MonoBehaviour
         }
     }
 
-    void RotateSelectedObject(Transform visualObj)
+    void RotateSelectedObject(BuildingsScriptableObjects selectedSO, Transform selectedObj)
     {
-        if (Input.GetKeyDown(KeyCode.R) && visualObj != null)
+        if (Input.GetKeyDown(KeyCode.R) && selectedSO != null)
         {
-            buildingScriptableObject.GetNextRotation(visualObj);
-            print(buildingScriptableObject.buildingRotation);
+            SelectedObjectHandler.Instance.RotateSelectedObject(selectedSO, selectedObj);
         }
     }
 

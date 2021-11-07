@@ -17,12 +17,15 @@ public class ToolTypes : MonoBehaviour
     public enum Tools
     {
         Builder,
+        bulldozer,
         Axe,
     };
 
 
     private void Update()
     {
+        if (Input.GetKey(KeyCode.Q)) { return; }
+        
         if (Input.GetAxis("Mouse ScrollWheel") > 0)
         {
             CharacterStates.Instance.state = CharacterStates.Instance.GetNextState();

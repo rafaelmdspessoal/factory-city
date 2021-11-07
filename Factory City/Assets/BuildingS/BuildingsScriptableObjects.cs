@@ -12,33 +12,29 @@ public class BuildingsScriptableObjects : ScriptableObject
     public string columnName;
     public BuildingRotation buildingRotation;
 
+    void Awake()
+    {
+        buildingRotation = BuildingRotation.Zero;
+        currentDimention = dimention;
+    }
 
-    public BuildingRotation GetNextRotation(Transform obj)
+    public BuildingRotation GetNextRotation()
     {
         switch (buildingRotation)
         {
             default:
-                return BuildingRotation.Zero;
+                buildingRotation = BuildingRotation.Zero;
+                return buildingRotation;
             case BuildingRotation.Zero:
-                currentDimention.x = dimention.z;
-                currentDimention.z = dimention.x;
-                obj.rotation = Quaternion.Euler(0, 90, 0);
                 buildingRotation = BuildingRotation.Ninety;
                 return buildingRotation;
             case BuildingRotation.Ninety:
-                currentDimention = dimention;
-                obj.rotation = Quaternion.Euler(0, 180, 0);
                 buildingRotation = BuildingRotation.OneEighty;
                 return buildingRotation;
             case BuildingRotation.OneEighty:
-                currentDimention.x = dimention.z;
-                currentDimention.z = dimention.x;
-                obj.rotation = Quaternion.Euler(0, 270, 0);
                 buildingRotation = BuildingRotation.TwoSeventy;
                 return buildingRotation;
             case BuildingRotation.TwoSeventy:
-                currentDimention = dimention;
-                obj.rotation = Quaternion.identity;
                 buildingRotation = BuildingRotation.Zero;
                 return buildingRotation;
         }

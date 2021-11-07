@@ -17,6 +17,7 @@ public class CharacterStates : MonoBehaviour
     public enum State
     {
         Building,
+        Demolishing,
         NotBuilding,
     };
 
@@ -30,7 +31,11 @@ public class CharacterStates : MonoBehaviour
                 return State.NotBuilding;
             case State.Building:
                 BuildingSystem.Instance.UnsetSelectedObject();
-                print("not building");
+                print("Demolishing");
+                return State.Demolishing;
+            case State.Demolishing:
+                BuildingSystem.Instance.UnsetSelectedObject();
+                print("NotBuilding");
                 return State.NotBuilding;
             case State.NotBuilding:
                 BuildingSystem.Instance.UnsetSelectedObject();
