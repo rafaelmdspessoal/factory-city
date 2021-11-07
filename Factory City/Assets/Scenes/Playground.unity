@@ -333,8 +333,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hoverBehaviourType: 1
-  hoverBehaviour_Color_Enter: {r: 0, g: 0, b: 0, a: 0}
-  hoverBehaviour_Color_Exit: {r: 0, g: 0, b: 0, a: 0}
+  hoverBehaviour_Color_Enter: {r: 0.5188679, g: 0.11992703, b: 0.11992703, a: 0}
+  hoverBehaviour_Color_Exit: {r: 0.9622642, g: 0.05900679, b: 0.05900679, a: 0}
   hoverBehaviour_Image: {fileID: 0}
   hoverBehaviour_Sprite_Exit: {fileID: 0}
   hoverBehaviour_Sprite_Enter: {fileID: 0}
@@ -526,8 +526,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hoverBehaviourType: 1
-  hoverBehaviour_Color_Enter: {r: 0, g: 0, b: 0, a: 0}
-  hoverBehaviour_Color_Exit: {r: 0, g: 0, b: 0, a: 0}
+  hoverBehaviour_Color_Enter: {r: 0.5188679, g: 0.11992703, b: 0.11992703, a: 0}
+  hoverBehaviour_Color_Exit: {r: 0.9622642, g: 0.05900679, b: 0.05900679, a: 0}
   hoverBehaviour_Image: {fileID: 0}
   hoverBehaviour_Sprite_Exit: {fileID: 0}
   hoverBehaviour_Sprite_Enter: {fileID: 0}
@@ -781,8 +781,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hoverBehaviourType: 1
-  hoverBehaviour_Color_Enter: {r: 0, g: 0, b: 0, a: 0}
-  hoverBehaviour_Color_Exit: {r: 0, g: 0, b: 0, a: 0}
+  hoverBehaviour_Color_Enter: {r: 0.5188679, g: 0.11992703, b: 0.11992703, a: 0}
+  hoverBehaviour_Color_Exit: {r: 0.9622642, g: 0.05900679, b: 0.05900679, a: 0}
   hoverBehaviour_Image: {fileID: 0}
   hoverBehaviour_Sprite_Exit: {fileID: 0}
   hoverBehaviour_Sprite_Enter: {fileID: 0}
@@ -840,6 +840,8 @@ GameObject:
   - component: {fileID: 714434307}
   - component: {fileID: 714434305}
   - component: {fileID: 714434302}
+  - component: {fileID: 714434306}
+  - component: {fileID: 714434308}
   m_Layer: 0
   m_Name: BuildManager
   m_TagString: Untagged
@@ -859,6 +861,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b34b37bf2c8758049be65e94777910c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  state: 1
 --- !u!114 &714434303
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -874,12 +877,7 @@ MonoBehaviour:
   mouseColliderLayerMask:
     serializedVersion: 2
     m_Bits: 951
-  buildingScriptableObjectList:
-  - {fileID: 11400000, guid: 42a416e7e521f1e419dda9400bb7d5b9, type: 2}
-  - {fileID: 11400000, guid: 3749f102e5a708544ba51c10b96aa32e, type: 2}
-  - {fileID: 11400000, guid: d9b6571af35180e499ce46817c0829a3, type: 2}
   posistionSnap: 0
-  buildingType: 0
   test: {fileID: 293185703}
 --- !u!4 &714434304
 Transform:
@@ -907,6 +905,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e70cb835428644b408a21b3bc289302c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  buildingType: 0
+--- !u!114 &714434306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 714434301}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 064bfa8f9abab364eab95deb050c121c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tool: 0
 --- !u!114 &714434307
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -919,6 +931,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16f78b71f9044ee46a5d8fe9fad2b01e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  platform1: {fileID: 11400000, guid: 42a416e7e521f1e419dda9400bb7d5b9, type: 2}
+  platform2: {fileID: 11400000, guid: 3749f102e5a708544ba51c10b96aa32e, type: 2}
+  column: {fileID: 11400000, guid: d9b6571af35180e499ce46817c0829a3, type: 2}
+--- !u!114 &714434308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 714434301}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 449ceacab9287f54da90131b12cbb185, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  notBuildingBtn: {fileID: 1749311253}
+  platformsBtn:
+  - {fileID: 256769494}
+  - {fileID: 473720638}
+  columnsBtn:
+  - {fileID: 1276906316}
 --- !u!1001 &746329221
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1020,10 +1053,10 @@ RectTransform:
   m_Father: {fileID: 1749311254}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 35, y: -35}
+  m_SizeDelta: {x: 70, y: 70}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &792430013
 MonoBehaviour:
@@ -1743,7 +1776,6 @@ GameObject:
   - component: {fileID: 1749311257}
   - component: {fileID: 1749311256}
   - component: {fileID: 1749311255}
-  - component: {fileID: 1749311258}
   m_Layer: 5
   m_Name: NotBuildingBtn
   m_TagString: Untagged
@@ -1784,8 +1816,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hoverBehaviourType: 1
-  hoverBehaviour_Color_Enter: {r: 0, g: 0, b: 0, a: 0}
-  hoverBehaviour_Color_Exit: {r: 0, g: 0, b: 0, a: 0}
+  hoverBehaviour_Color_Enter: {r: 0.5188679, g: 0.11992703, b: 0.11992703, a: 0}
+  hoverBehaviour_Color_Exit: {r: 0.9622642, g: 0.05900679, b: 0.05900679, a: 0}
   hoverBehaviour_Image: {fileID: 0}
   hoverBehaviour_Sprite_Exit: {fileID: 0}
   hoverBehaviour_Sprite_Enter: {fileID: 0}
@@ -1830,30 +1862,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1749311253}
   m_CullTransparentMesh: 1
---- !u!114 &1749311258
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1749311253}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
-  m_ChildAlignment: 0
-  m_StartCorner: 2
-  m_StartAxis: 1
-  m_CellSize: {x: 70, y: 70}
-  m_Spacing: {x: 10, y: 0}
-  m_Constraint: 0
-  m_ConstraintCount: 2
 --- !u!1 &1764214107
 GameObject:
   m_ObjectHideFlags: 0
