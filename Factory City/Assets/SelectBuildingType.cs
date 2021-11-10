@@ -7,6 +7,7 @@ public class SelectBuildingType : MonoBehaviour
     [SerializeField] private GameObject notBuildingBtn;
     [SerializeField] private GameObject[] platformsBtn;
     [SerializeField] private GameObject[] columnsBtn;
+    [SerializeField] private GameObject[] rampsBtn;
 
     private void Start()
     {
@@ -19,6 +20,10 @@ public class SelectBuildingType : MonoBehaviour
         {
             columnBtn.SetActive(false);
         }
+        foreach (GameObject rampBtn in rampsBtn)
+        {
+            rampBtn.SetActive(false);
+        }
     }
 
     private void Update()
@@ -29,9 +34,9 @@ public class SelectBuildingType : MonoBehaviour
             {                
                 Cursor.lockState = CursorLockMode.Confined;
                 Cursor.visible = true;
+                notBuildingBtn.SetActive(true);
                 if (BuildingTypes.Instance.buildingType == BuildingTypes.BuildingType.Platforms)
                 {
-                    notBuildingBtn.SetActive(true);
                     foreach (GameObject platformBtn in platformsBtn)
                     {
                         platformBtn.SetActive(true);
@@ -40,10 +45,13 @@ public class SelectBuildingType : MonoBehaviour
                     {
                         columnBtn.SetActive(false);
                     }
+                    foreach (GameObject rampBtn in rampsBtn)
+                    {
+                        rampBtn.SetActive(false);
+                    }
                 }
                 else if (BuildingTypes.Instance.buildingType == BuildingTypes.BuildingType.Columns)
                 {
-                    notBuildingBtn.SetActive(true);
                     foreach (GameObject platformBtn in platformsBtn)
                     {
                         platformBtn.SetActive(false);
@@ -51,6 +59,25 @@ public class SelectBuildingType : MonoBehaviour
                     foreach (GameObject columnBtn in columnsBtn)
                     {
                         columnBtn.SetActive(true);
+                    }
+                    foreach (GameObject rampBtn in rampsBtn)
+                    {
+                        rampBtn.SetActive(false);
+                    }
+                }
+                else if (BuildingTypes.Instance.buildingType == BuildingTypes.BuildingType.Ramps)
+                {
+                    foreach (GameObject platformBtn in platformsBtn)
+                    {
+                        platformBtn.SetActive(false);
+                    }
+                    foreach (GameObject columnBtn in columnsBtn)
+                    {
+                        columnBtn.SetActive(false);
+                    }
+                    foreach (GameObject rampBtn in rampsBtn)
+                    {
+                        rampBtn.SetActive(true);
                     }
                 }
 
@@ -67,6 +94,10 @@ public class SelectBuildingType : MonoBehaviour
                 foreach (GameObject columnBtn in columnsBtn)
                 {
                     columnBtn.SetActive(false);
+                }
+                foreach (GameObject rampBtn in rampsBtn)
+                {
+                    rampBtn.SetActive(false);
                 }
             }
         }

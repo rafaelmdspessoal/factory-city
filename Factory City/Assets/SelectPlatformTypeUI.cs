@@ -7,13 +7,9 @@ public class SelectPlatformTypeUI : MonoBehaviour
 {
     void Awake()
     {
-        transform.Find("Platform1Btn").GetComponent<Button_UI>().ClickFunc = () =>
+        transform.Find("PlatformBtn").GetComponent<Button_UI>().ClickFunc = () =>
         {
-            BuildingSystem.Instance.SetSelectedObject(BuildingsBuildingSystemAssets.Instance.platform1);
-        };
-        transform.Find("Platform2Btn").GetComponent<Button_UI>().ClickFunc = () =>
-        {
-            BuildingSystem.Instance.SetSelectedObject(BuildingsBuildingSystemAssets.Instance.platform2);
+            BuildingSystem.Instance.SetSelectedObject(BuildingsBuildingSystemAssets.Instance.platform);
         };
     }
 }

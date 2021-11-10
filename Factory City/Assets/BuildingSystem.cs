@@ -100,6 +100,33 @@ public class BuildingSystem : MonoBehaviour
                             );
                         }
                         break;
+                    case BuildingTypes.BuildingType.Ramps:
+                        if (layer != 7 && layer != 8 && layer != 9 && layer != 10)
+                        {
+                            canBuild = false;
+                            break;
+                        }
+                        if (layer == 7)
+                        {
+                            visualsPos = GetPlatformPositionToBuildRamp(hitTransform, mousePos);
+                        }
+                        else if (layer == 8)
+                        {
+                            visualsPos = GetColumnPositionToBuildPlatform(hitTransform, mousePos);
+                        }
+                        else if (layer == 9)
+                        {
+                            visualsPos = new Vector3(
+                                Mathf.RoundToInt(mousePos.x),
+                                0,
+                                Mathf.RoundToInt(mousePos.z)
+                            ); 
+                        }
+                        else if (layer == 10)
+                        {
+                            visualsPos = GetRampPositionToBuildRamp(hitTransform, raycastHit.normal, mousePos);
+                        }
+                        break;
                     case BuildingTypes.BuildingType.Columns:
                         if (layer != 7)
                         {
@@ -193,10 +220,9 @@ public class BuildingSystem : MonoBehaviour
         Vector3 hitObjScale = referenceObject.localScale;
         Vector3 hitObjRot = referenceObject.rotation.eulerAngles;
 
-        objHitPos.y = 0;
         if (Mathf.Abs(objHitPos.x) > Mathf.Abs(objHitPos.z)) { objHitPos.z = 0; } else { objHitPos.x = 0; }
         objHitPos = objHitPos.normalized;
-        hitObjPos.y = hitObjPos.y - (hitObjScale.y / 2);
+        hitObjPos.y -= (hitObjScale.y / 2);
 
         Vector3 hitObjectDimention = GetRotateObjectDimention(hitObjScale, hitObjRot);
 
@@ -209,6 +235,107 @@ public class BuildingSystem : MonoBehaviour
 
         return finalPosition;
     }
+
+    private Vector3 GetPlatformPositionToBuildRamp(Transform referenceObject, Vector3 mousePosition)
+    {
+        Vector3 hitObjPos = referenceObject.position;
+        Vector3 objHitPos = (mousePosition - hitObjPos);
+        Vector3 selectedObjDimentions = buildingScriptableObject.currentDimention;
+        Vector3 hitObjScale = referenceObject.localScale;
+        Vector3 hitObjRot = referenceObject.rotation.eulerAngles;
+
+        objHitPos.y = 0;
+        if (Mathf.Abs(objHitPos.x) > Mathf.Abs(objHitPos.z)) { objHitPos.z = 0; } else { objHitPos.x = 0; }
+        objHitPos = objHitPos.normalized;
+        hitObjPos.y -= hitObjScale.y / 2;
+
+        Vector3 hitObjectDimention = GetRotateObjectDimention(hitObjScale, hitObjRot);
+
+        Vector3 offset = (selectedObjDimentions + hitObjectDimention) / 2;
+
+        Vector3 finalPosition = hitObjPos;
+        finalPosition.x += offset.x * objHitPos.x;
+        finalPosition.y += offset.y * objHitPos.y;
+        finalPosition.z += offset.z * objHitPos.z;
+
+        return finalPosition;
+    }
+
+    private Vector3 GetRampPositionToBuildRamp(Transform referenceObject, Vector3 normal, Vector3 mousePosition)
+    {
+        Vector3 hitObjPos = referenceObject.position;
+        Vector3 objHitPos = (mousePosition - hitObjPos);
+        Vector3 selectedObjDimentions = buildingScriptableObject.currentDimention;
+        Vector3 hitObjScale = referenceObject.localScale;
+        Vector3 hitObjRot = referenceObject.rotation.eulerAngles;
+
+        Vector3 horizontalHitDirection = new Vector3(objHitPos.x, 0, objHitPos.z);
+        Vector3 vertialHitDirection = new Vector3(0, objHitPos.y, 0);
+
+        Vector3 hitObjectDimention = GetRotateObjectDimention(hitObjScale, hitObjRot);
+        hitObjectDimention.y = hitObjScale.y;
+        Vector3 offset = (selectedObjDimentions + hitObjectDimention) / 2;
+
+        Vector3 finalPosition = hitObjPos;
+        finalPosition.y -= hitObjScale.y / 2;
+
+        Vector3 dir = Vector3.zero;
+        if (normal.y > 0)
+        {
+            if (vertialHitDirection.y > 0.2f)
+            {
+                if (Mathf.RoundToInt(normal.x) == 0)
+                {
+                    dir.x = 0;
+                    if (normal.z < 0) { dir.z = 1; } else { dir.z = -1; }
+                }
+                if (Mathf.RoundToInt(normal.z) == 0)
+                {
+                    dir.z = 0;
+                    if (normal.x < 0) { dir.x = 1; } else { dir.x = -1; }
+                }
+                finalPosition.y += offset.y;
+            }
+            else if (vertialHitDirection.y < -0.2f)
+            {
+                if (Mathf.RoundToInt(normal.x) == 0)
+                {
+                    dir.x = 0;
+                    if (normal.z > 0) { dir.z = 1; } else { dir.z = -1; }
+
+                }
+                if (Mathf.RoundToInt(normal.z) == 0)
+                {
+                    dir.z = 0;
+                    if (normal.x > 0) { dir.x = 1; } else { dir.x = -1; }
+                }
+                finalPosition.y -= offset.y;
+            }
+            else
+            {
+                if (Mathf.RoundToInt(normal.x) == 0)
+                {
+                    horizontalHitDirection.z = 0;
+                    horizontalHitDirection.x = Mathf.Sign(objHitPos.x) * 1;
+
+                }
+                if (Mathf.RoundToInt(normal.z) == 0)
+                {
+                    horizontalHitDirection.x = 0;
+                    horizontalHitDirection.z = Mathf.Sign(objHitPos.z) * 1;
+                }
+
+                finalPosition.x += offset.x * horizontalHitDirection.x;
+                finalPosition.z += offset.z * horizontalHitDirection.z;
+            }
+        }
+        
+        finalPosition.x += offset.x * dir.x;        
+        finalPosition.z += offset.z * dir.z;
+
+        return finalPosition;
+    }
+
 
     private Vector3 GetRotateObjectDimention(Vector3 objDimention, Vector3 objRotation)
     {

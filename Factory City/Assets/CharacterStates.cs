@@ -27,8 +27,8 @@ public class CharacterStates : MonoBehaviour
         {
             default:
                 BuildingSystem.Instance.UnsetSelectedObject();
-                print("not building");
-                return State.NotBuilding;
+                print("building");
+                return State.Building;
             case State.Building:
                 BuildingSystem.Instance.UnsetSelectedObject();
                 print("Demolishing");

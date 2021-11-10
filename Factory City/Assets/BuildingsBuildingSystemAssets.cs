@@ -11,7 +11,7 @@ public class BuildingsBuildingSystemAssets : MonoBehaviour
         Instance = this;
     }
 
-    public BuildingsScriptableObjects platform1;
-    public BuildingsScriptableObjects platform2;
+    public BuildingsScriptableObjects platform;
     public BuildingsScriptableObjects column;
+    public BuildingsScriptableObjects ramp;
 }

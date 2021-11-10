@@ -19,6 +19,7 @@ public class BuildingTypes : MonoBehaviour
         Platforms,
         Walls,
         Columns,
+        Ramps,
     };
 
     private void Update()
@@ -29,13 +30,22 @@ public class BuildingTypes : MonoBehaviour
             { 
                 buildingType = BuildingType.Platforms;
                 BuildingSystem.Instance.UnsetSelectedObject();
+                BuildingSystem.Instance.SetSelectedObject(BuildingsBuildingSystemAssets.Instance.platform);
                 print("Platform");
             }
             if (Input.GetKeyDown(KeyCode.Alpha2))
             {
                 buildingType = BuildingType.Columns;
                 BuildingSystem.Instance.UnsetSelectedObject();
+                BuildingSystem.Instance.SetSelectedObject(BuildingsBuildingSystemAssets.Instance.column);
                 print("Column");
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                buildingType = BuildingType.Ramps;
+                BuildingSystem.Instance.UnsetSelectedObject();
+                BuildingSystem.Instance.SetSelectedObject(BuildingsBuildingSystemAssets.Instance.ramp);
+                print("Ramp");
             }
         }
     }
