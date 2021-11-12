@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
+using System;
 
 public class HandleObjectCreationDestruction : MonoBehaviour, IManipulable
 {
     public void DestroySelf()
     {
-        Destroy(transform.parent.gameObject);
+        Destroy(transform.gameObject);
         print("Destroy");
     }
 

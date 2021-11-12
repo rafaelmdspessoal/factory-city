@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee95fe36c94ec3d469416125147f470d, type: 3}
   m_Name: Platform_10x200x100_ScriptableObjects
   m_EditorClassIdentifier: 
-  prefab: {fileID: 2106882994946784591, guid: 921ecc149407e6744859426037abeb17, type: 3}
-  visual: {fileID: 8329102595451250992, guid: 67506cca9a9d0c14aa4c5116cbeb42d9, type: 3}
+  prefab: {fileID: 27238054261933908, guid: 7bc6a0e762ae57c4f9c26e17f6d5b74c, type: 3}
+  visual: {fileID: 6139775238654346327, guid: 67506cca9a9d0c14aa4c5116cbeb42d9, type: 3}
   dimention: {x: 2, y: 0.1, z: 1}
-  currentDimention: {x: 2, y: 0.1, z: 1}
+  currentDimention: {x: 1, y: 0.1, z: 2}
   columnName: Platform 10x200x100
-  buildingRotation: 2
+  buildingRotation: 3
