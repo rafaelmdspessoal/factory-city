@@ -7,9 +7,17 @@ public class SelectRampTypeUI : MonoBehaviour
 {
     void Awake()
     {
-        transform.Find("RampBtn").GetComponent<Button_UI>().ClickFunc = () =>
+        transform.Find("Ramp15Btn").GetComponent<Button_UI>().ClickFunc = () =>
         {
-            BuildingSystem.Instance.SetSelectedObject(BuildingsBuildingSystemAssets.Instance.ramp);
+            BuildingSystem.Instance.SetSelectedObject(BuildingsBuildingSystemAssets.Instance.ramp15);
+        };
+        transform.Find("Ramp30Btn").GetComponent<Button_UI>().ClickFunc = () =>
+        {
+            BuildingSystem.Instance.SetSelectedObject(BuildingsBuildingSystemAssets.Instance.ramp30);
+        };
+        transform.Find("Ramp45Btn").GetComponent<Button_UI>().ClickFunc = () =>
+        {
+            BuildingSystem.Instance.SetSelectedObject(BuildingsBuildingSystemAssets.Instance.ramp45);
         };
     }
 }

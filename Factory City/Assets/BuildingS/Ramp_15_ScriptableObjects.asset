@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ee95fe36c94ec3d469416125147f470d, type: 3}
-  m_Name: ColumnsScriptableObjects
+  m_Name: Ramp_15_ScriptableObjects
   m_EditorClassIdentifier: 
-  prefab: {fileID: 8114786228925144399, guid: ea96ff3030ad46841b8e671ed23c74ac, type: 3}
-  visual: {fileID: 3298728285929617151, guid: bd8f97c05219faf4abe620eef40658a0, type: 3}
-  dimention: {x: 0.1, y: 3, z: 0.1}
-  currentDimention: {x: 0.1, y: 3, z: 0.1}
-  columnName: Column 3
-  buildingRotation: 0
+  prefab: {fileID: 1674482491637393586, guid: a34a1854ae3a851419fe872992c8d287, type: 3}
+  visual: {fileID: 815642934577890531, guid: 3f5cc5c52294424429ede534b5c1bc57, type: 3}
+  dimention: {x: 1, y: 0.3333333, z: 1}
+  currentDimention: {x: 1, y: 0.3333333, z: 1}
+  columnName: Ramp 15
+  buildingRotation: 1
   cantBuildColor: {r: 1, g: 0, b: 0, a: 0}
   visualColor: {r: 1, g: 1, b: 1, a: 0}

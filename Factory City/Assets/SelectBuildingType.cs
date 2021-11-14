@@ -4,14 +4,13 @@ using UnityEngine;
 
 public class SelectBuildingType : MonoBehaviour
 {
-    [SerializeField] private GameObject notBuildingBtn;
     [SerializeField] private GameObject[] platformsBtn;
     [SerializeField] private GameObject[] columnsBtn;
+    [SerializeField] private GameObject[] wallsBtn;
     [SerializeField] private GameObject[] rampsBtn;
 
     private void Start()
     {
-        notBuildingBtn.SetActive(false);
         foreach (GameObject platformBtn in platformsBtn)
         {
             platformBtn.SetActive(false);
@@ -24,6 +23,10 @@ public class SelectBuildingType : MonoBehaviour
         {
             rampBtn.SetActive(false);
         }
+        foreach (GameObject wallBtn in wallsBtn)
+        {
+            wallBtn.SetActive(false);
+        }
     }
 
     private void Update()
@@ -34,7 +37,6 @@ public class SelectBuildingType : MonoBehaviour
             {                
                 Cursor.lockState = CursorLockMode.Confined;
                 Cursor.visible = true;
-                notBuildingBtn.SetActive(true);
                 if (BuildingTypes.Instance.buildingType == BuildingTypes.BuildingType.Platforms)
                 {
                     foreach (GameObject platformBtn in platformsBtn)
@@ -44,6 +46,10 @@ public class SelectBuildingType : MonoBehaviour
                     foreach (GameObject columnBtn in columnsBtn)
                     {
                         columnBtn.SetActive(false);
+                    }
+                    foreach (GameObject wallBtn in wallsBtn)
+                    {
+                        wallBtn.SetActive(false);
                     }
                     foreach (GameObject rampBtn in rampsBtn)
                     {
@@ -60,6 +66,10 @@ public class SelectBuildingType : MonoBehaviour
                     {
                         columnBtn.SetActive(true);
                     }
+                    foreach (GameObject wallBtn in wallsBtn)
+                    {
+                        wallBtn.SetActive(false);
+                    }
                     foreach (GameObject rampBtn in rampsBtn)
                     {
                         rampBtn.SetActive(false);
@@ -75,9 +85,32 @@ public class SelectBuildingType : MonoBehaviour
                     {
                         columnBtn.SetActive(false);
                     }
+                    foreach (GameObject wallBtn in wallsBtn)
+                    {
+                        wallBtn.SetActive(false);
+                    }
                     foreach (GameObject rampBtn in rampsBtn)
                     {
                         rampBtn.SetActive(true);
+                    }
+                }
+                else if (BuildingTypes.Instance.buildingType == BuildingTypes.BuildingType.Walls)
+                {
+                    foreach (GameObject platformBtn in platformsBtn)
+                    {
+                        platformBtn.SetActive(false);
+                    }
+                    foreach (GameObject columnBtn in columnsBtn)
+                    {
+                        columnBtn.SetActive(false);
+                    }
+                    foreach (GameObject wallBtn in wallsBtn)
+                    {
+                        wallBtn.SetActive(true);
+                    }
+                    foreach (GameObject rampBtn in rampsBtn)
+                    {
+                        rampBtn.SetActive(false);
                     }
                 }
 
@@ -86,7 +119,6 @@ public class SelectBuildingType : MonoBehaviour
             {
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
-                notBuildingBtn.SetActive(false);
                 foreach (GameObject platformBtn in platformsBtn)
                 {
                     platformBtn.SetActive(false);
@@ -94,6 +126,10 @@ public class SelectBuildingType : MonoBehaviour
                 foreach (GameObject columnBtn in columnsBtn)
                 {
                     columnBtn.SetActive(false);
+                }
+                foreach (GameObject wallBtn in wallsBtn)
+                {
+                    wallBtn.SetActive(false);
                 }
                 foreach (GameObject rampBtn in rampsBtn)
                 {

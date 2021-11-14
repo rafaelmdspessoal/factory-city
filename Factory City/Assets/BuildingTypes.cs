@@ -44,8 +44,15 @@ public class BuildingTypes : MonoBehaviour
             {
                 buildingType = BuildingType.Ramps;
                 BuildingSystem.Instance.UnsetSelectedObject();
-                BuildingSystem.Instance.SetSelectedObject(BuildingsBuildingSystemAssets.Instance.ramp);
+                BuildingSystem.Instance.SetSelectedObject(BuildingsBuildingSystemAssets.Instance.ramp15);
                 print("Ramp");
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha4))
+            {
+                buildingType = BuildingType.Walls;
+                BuildingSystem.Instance.UnsetSelectedObject();
+                BuildingSystem.Instance.SetSelectedObject(BuildingsBuildingSystemAssets.Instance.wall);
+                print("Wall");
             }
         }
     }

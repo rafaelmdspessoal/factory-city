@@ -18,7 +18,19 @@ public class SaveData
         public Quaternion rotation;
     }
     [System.Serializable]
-    public struct RampData
+    public struct Ramp15Data
+    {
+        public Vector3 position;
+        public Quaternion rotation;
+    }
+    [System.Serializable]
+    public struct Ramp30Data
+    {
+        public Vector3 position;
+        public Quaternion rotation;
+    }
+    [System.Serializable]
+    public struct Ramp45Data
     {
         public Vector3 position;
         public Quaternion rotation;
@@ -39,7 +51,9 @@ public class SaveData
     public PlayerData playerData = new PlayerData();
     public List<PlatformData> platformData = new List<PlatformData>();
     public List<ColumnData> columnData = new List<ColumnData>();
-    public List<RampData> rampData = new List<RampData>();
+    public List<Ramp15Data> ramp15Data = new List<Ramp15Data>();
+    public List<Ramp30Data> ramp30Data = new List<Ramp30Data>();
+    public List<Ramp45Data> ramp45Data = new List<Ramp45Data>();
 
     public string ToJson()
     {

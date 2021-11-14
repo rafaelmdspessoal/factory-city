@@ -50,9 +50,14 @@ public class BuildingSystem : MonoBehaviour
                 canBuild = false;
                 return;
             }
+            visual.GetComponent<Renderer>().material.color = buildingScriptableObject.visualColor;
 
             RotateSelectedObject(buildingScriptableObject, visual);
             canBuild = CanBuild(visual);
+            if (!canBuild)
+            {
+                visual.GetComponent<Renderer>().material.color = buildingScriptableObject.cantBuildColor;
+            }
 
             if (Physics.Raycast(ray, out raycastHit, 999f, mouseColliderLayerMask))
             {
@@ -63,10 +68,10 @@ public class BuildingSystem : MonoBehaviour
                 switch (BuildingTypes.Instance.buildingType)
                 {
                     case BuildingTypes.BuildingType.Platforms:
-                        if (layer != 7 && layer != 8 && layer != 9)
+                        if (layer != 7 && layer != 8 && layer != 9 && layer != 10)
                         {
                             canBuild = false;
-                            break;
+                            visual.GetComponent<Renderer>().material.color = buildingScriptableObject.cantBuildColor;
                         }
                         if (layer == 7)
                         {
@@ -84,12 +89,16 @@ public class BuildingSystem : MonoBehaviour
                                 Mathf.RoundToInt(mousePos.z)
                             );
                         }
+                        else if (layer == 10)
+                        {
+                            visualsPos = GetRampPositionToBuildPlatform(hitTransform, raycastHit.normal, mousePos);
+                        }
                         break;
                     case BuildingTypes.BuildingType.Ramps:
                         if (layer != 7 && layer != 8 && layer != 9 && layer != 10)
                         {
                             canBuild = false;
-                            break;
+                            visual.GetComponent<Renderer>().material.color = buildingScriptableObject.cantBuildColor;
                         }
                         if (layer == 7)
                         {
@@ -116,9 +125,43 @@ public class BuildingSystem : MonoBehaviour
                         if (layer != 7)
                         {
                             canBuild = false;
-                            break;
+                            visual.GetComponent<Renderer>().material.color = buildingScriptableObject.cantBuildColor;
                         }
-                        visualsPos = GetPlatformPositionToBuildColumn(hitTransform, mousePos);
+                        if (layer == 7)
+                        {
+                            visualsPos = GetPlatformPositionToBuildColumn(hitTransform, mousePos);
+                        }
+                        else if (layer == 9)
+                        {
+                            visualsPos = new Vector3(
+                                Mathf.RoundToInt(mousePos.x),
+                                buildingScriptableObject.dimention.y / 2,
+                                Mathf.RoundToInt(mousePos.z)
+                            );
+                        }
+                        break;
+                    case BuildingTypes.BuildingType.Walls:
+                        if (layer != 7 && layer != 9 && layer != 11)
+                        {
+                            canBuild = false;
+                            visual.GetComponent<Renderer>().material.color = buildingScriptableObject.cantBuildColor;
+                        }
+                        if (layer == 7)
+                        {
+                            visualsPos = GetPlatformPositionToBuildWall(hitTransform, mousePos);
+                        }
+                        else if (layer == 9)
+                        {
+                            visualsPos = new Vector3(
+                                Mathf.RoundToInt(mousePos.x),
+                                buildingScriptableObject.dimention.y / 2,
+                                Mathf.RoundToInt(mousePos.z)
+                            );
+                        }
+                        else if (layer == 11)
+                        {
+                            visualsPos = GetdWallPositionToBuilddWall(hitTransform, mousePos);
+                        }
                         break;
                 }
 
@@ -127,6 +170,7 @@ public class BuildingSystem : MonoBehaviour
             else
             {
                 canBuild = false;
+                visual.GetComponent<Renderer>().material.color = buildingScriptableObject.cantBuildColor;
             }
 
             if (Input.GetMouseButtonDown(0))
@@ -152,15 +196,13 @@ public class BuildingSystem : MonoBehaviour
     {
         Vector3 hitObjPos = referenceObject.position;
         Vector3 objHitPos = (mousePosition - hitObjPos);
+        Vector3 hitObjRot = referenceObject.rotation.eulerAngles;
         Vector3 selectedObjDimentions = buildingScriptableObject.currentDimention;
         Vector3 hitObjScale = referenceObject.localScale;
         Vector3 finalPosition = hitObjPos;
 
-        Vector3 offset = new Vector3(
-            selectedObjDimentions.x,
-            selectedObjDimentions.y + hitObjScale.y,
-            selectedObjDimentions.z
-            ) / 2;            
+        Vector3 hitObjectDimention = GetRotateObjectDimention(hitObjScale, hitObjRot);
+        Vector3 offset = (selectedObjDimentions + hitObjectDimention) / 2;
 
         if (objHitPos.x > 0.2f) { finalPosition.x += offset.x; }
         else if (objHitPos.x < -0.2f) { finalPosition.x -= offset.x; }
@@ -182,7 +224,7 @@ public class BuildingSystem : MonoBehaviour
         Vector3 selectedObjDimentions = buildingScriptableObject.currentDimention;
         Vector3 hitObjectDimention = GetRotateObjectDimention(hitObjScale, hitObjRot);
 
-        Vector3 offset = hitObjectDimention / 2;
+        Vector3 offset = (selectedObjDimentions + hitObjectDimention) / 2;
 
         Vector3 finalPosition = hitObjPos;
 
@@ -192,7 +234,46 @@ public class BuildingSystem : MonoBehaviour
         if (objHitPos.z > 0.2f) { finalPosition.z += offset.z; }
         else if (objHitPos.z < -0.2f) { finalPosition.z -= offset.z; }
 
-        finalPosition.y += offset.y + selectedObjDimentions.y / 2;
+        finalPosition.y += offset.y - hitObjScale.y;
+
+        return finalPosition;
+    }
+
+    private Vector3 GetPlatformPositionToBuildWall(Transform referenceObject, Vector3 mousePosition)
+    {
+        Vector3 hitObjPos = referenceObject.position;
+        Vector3 objHitPos = (mousePosition - hitObjPos);
+        Vector3 hitObjRot = referenceObject.rotation.eulerAngles;
+        Vector3 hitObjScale = referenceObject.localScale;
+        Vector3 selectedObjDimentions = buildingScriptableObject.currentDimention;
+        Vector3 hitObjectDimention = GetRotateObjectDimention(hitObjScale, hitObjRot);
+
+        Vector3 offset = (selectedObjDimentions + hitObjectDimention) / 2;
+
+        Vector3 finalPosition = hitObjPos;
+
+        if (Mathf.Abs(objHitPos.x) > Mathf.Abs(objHitPos.z))
+        {
+            if (Mathf.RoundToInt(visual.localRotation.eulerAngles.y) != Mathf.Abs(0) &
+                    Mathf.RoundToInt(visual.localRotation.eulerAngles.y) != Mathf.Abs(180))
+            {
+                SelectedObjectHandler.Instance.RotateSelectedObject(buildingScriptableObject, visual);
+            }
+
+            if (objHitPos.x >= 0) { finalPosition.x += offset.x; } else { finalPosition.x -= offset.x; }
+        }
+        else
+        {
+            if (Mathf.RoundToInt(visual.localRotation.eulerAngles.y) != Mathf.Abs(90) &
+                Mathf.RoundToInt(visual.localRotation.eulerAngles.y) != Mathf.Abs(270))
+            {
+                SelectedObjectHandler.Instance.RotateSelectedObject(buildingScriptableObject, visual);
+            }
+
+            if (objHitPos.z >= 0) { finalPosition.z += offset.z; } else { finalPosition.z -= offset.z; }
+        }
+
+        finalPosition.y += offset.y - hitObjScale.y;
 
         return finalPosition;
     }
@@ -221,7 +302,7 @@ public class BuildingSystem : MonoBehaviour
         return finalPosition;
     }
 
-    private Vector3 GetPlatformPositionToBuildRamp(Transform referenceObject, Vector3 mousePosition)
+    private Vector3 GetRampPositionToBuildPlatform(Transform referenceObject, Vector3 normal, Vector3 mousePosition)
     {
         Vector3 hitObjPos = referenceObject.position;
         Vector3 objHitPos = (mousePosition - hitObjPos);
@@ -229,18 +310,187 @@ public class BuildingSystem : MonoBehaviour
         Vector3 hitObjScale = referenceObject.localScale;
         Vector3 hitObjRot = referenceObject.rotation.eulerAngles;
 
+        Vector3 vertialHitDirection = new Vector3(0, objHitPos.y, 0);
+
+        Vector3 hitObjectDimention = GetRotateObjectDimention(hitObjScale, hitObjRot);
+        hitObjectDimention.y = hitObjScale.y;
+        Vector3 offset = (selectedObjDimentions + hitObjectDimention) / 2;
+
+        Vector3 finalPosition = hitObjPos;
+
+        Vector3 dir = Vector3.zero;
+        if (vertialHitDirection.y >= 0)
+        {
+            if (normal.x > -0.1f && normal.x < 0.1f)
+            {
+                dir.x = 0;
+                if (normal.z < 0) { dir.z = 1; } else { dir.z = -1; }
+            }
+            if (normal.z > -0.1f && normal.z < 0.1f)
+            {
+                dir.z = 0;
+                if (normal.x < 0) { dir.x = 1; } else { dir.x = -1; }
+            }
+            finalPosition.y += offset.y;
+        }
+        else
+        {
+            if (normal.x > -0.1f && normal.x < 0.1f)
+            {
+                dir.x = 0;
+                if (normal.z > 0) { dir.z = 1; } else { dir.z = -1; }
+
+            }
+            if (normal.z > -0.1f && normal.z < 0.1f)
+            {
+                dir.z = 0;
+                if (normal.x > 0) { dir.x = 1; } else { dir.x = -1; }
+            }
+            finalPosition.y -= (offset.y - selectedObjDimentions.y);
+        }
+
+        finalPosition.x += offset.x * dir.x;
+        finalPosition.z += offset.z * dir.z;
+
+        return finalPosition;
+    }
+
+    private Vector3 GetdWallPositionToBuilddWall(Transform referenceObject, Vector3 mousePosition)
+    {
+        Vector3 hitObjPos = referenceObject.position;
+        Vector3 objHitPos = (mousePosition - hitObjPos);
+        Vector3 selectedObjDimentions = buildingScriptableObject.currentDimention;
+        Vector3 hitObjScale = referenceObject.localScale;
+        Vector3 hitObjRot = referenceObject.rotation.eulerAngles;
+
+        if (visual.localRotation != referenceObject.rotation)
+        {
+            SelectedObjectHandler.Instance.RotateSelectedObject(buildingScriptableObject, visual);
+        }
+
+        Vector3 horizontalHitDirection = new Vector3(objHitPos.x, 0, objHitPos.z);
+        Vector3 vertialHitDirection = new Vector3(0, objHitPos.y, 0);
+
+        Vector3 hitObjectDimention = GetRotateObjectDimention(hitObjScale, hitObjRot);
+        hitObjectDimention.y = hitObjScale.y;
+        Vector3 offset = (selectedObjDimentions + hitObjectDimention) / 2;
+
+        Vector3 finalPosition = hitObjPos;
+
+        if (vertialHitDirection.y > 0.2f)
+        {
+            finalPosition.y += offset.y;
+        }
+        else if (vertialHitDirection.y < -0.2f)
+        {
+            finalPosition.y -= offset.y;
+        }
+        else
+        {
+            horizontalHitDirection.y = 0;
+            if (Mathf.Abs(horizontalHitDirection.x) > Mathf.Abs(horizontalHitDirection.z)) {
+                horizontalHitDirection.z = 0; 
+            } else 
+            {
+                horizontalHitDirection.x = 0; 
+            }
+            horizontalHitDirection = horizontalHitDirection.normalized;
+
+            finalPosition.x += offset.x * horizontalHitDirection.x;
+            finalPosition.z += offset.z * horizontalHitDirection.z;
+        }
+
+        return finalPosition;
+    }
+
+    private Vector3 GetPlatformPositionToBuildRamp(Transform referenceObject, Vector3 mousePosition)
+    {
+        Vector3 hitObjPos = referenceObject.position;
+        Vector3 objHitPos = (mousePosition - hitObjPos);
+        Vector3 selectedObjDimentions = buildingScriptableObject.currentDimention;
+        Vector3 selectedObjecRotation = visual.localRotation.eulerAngles;
+        Vector3 hitObjScale = referenceObject.localScale;
+        Vector3 hitObjRot = referenceObject.rotation.eulerAngles;
+
+        Vector3 vertialOffset = Vector3.zero;
         objHitPos.y = 0;
-        if (Mathf.Abs(objHitPos.x) > Mathf.Abs(objHitPos.z)) { objHitPos.z = 0; } else { objHitPos.x = 0; }
+        if (Mathf.Abs(objHitPos.x) > Mathf.Abs(objHitPos.z)) {
+            objHitPos.z = 0; 
+            if (objHitPos.x > 0)
+            {
+                if (Mathf.Abs(Mathf.RoundToInt(selectedObjecRotation.y)) == 0)
+                {
+                    vertialOffset.y = (-hitObjScale.y - selectedObjDimentions.y) / 2;
+                }
+                else if (Mathf.Abs(Mathf.RoundToInt(selectedObjecRotation.y)) == 180)
+                {
+                    vertialOffset.y = (-hitObjScale.y + selectedObjDimentions.y) / 2;
+                }
+                else
+                {
+                    SelectedObjectHandler.Instance.RotateSelectedObject(buildingScriptableObject, visual);
+                }
+            }
+            else
+            {
+                if (Mathf.Abs(Mathf.RoundToInt(selectedObjecRotation.y)) == 0)
+                {
+                    vertialOffset.y = (-hitObjScale.y + selectedObjDimentions.y) / 2;
+                }
+                else if (Mathf.Abs(Mathf.RoundToInt(selectedObjecRotation.y)) == 180)
+                {
+                    vertialOffset.y = (-hitObjScale.y - selectedObjDimentions.y) / 2;
+                }
+                else
+                {
+                    SelectedObjectHandler.Instance.RotateSelectedObject(buildingScriptableObject, visual);
+                }
+            }
+        }
+        else 
+        { 
+            objHitPos.x = 0;
+            if (objHitPos.z < 0)
+            {
+                if (Mathf.Abs(Mathf.RoundToInt(selectedObjecRotation.y)) == 90)
+                {
+                    vertialOffset.y = (-hitObjScale.y - selectedObjDimentions.y) / 2;
+                }
+                else if (Mathf.Abs(Mathf.RoundToInt(selectedObjecRotation.y)) == 270)
+                {
+                    vertialOffset.y = (-hitObjScale.y + selectedObjDimentions.y) / 2;
+                }
+                else
+                {
+                    SelectedObjectHandler.Instance.RotateSelectedObject(buildingScriptableObject, visual);
+                }
+            }
+            else
+            {
+                if (Mathf.Abs(Mathf.RoundToInt(selectedObjecRotation.y)) == 90)
+                {
+                    vertialOffset.y = (-hitObjScale.y + selectedObjDimentions.y) / 2;
+                }
+                else if (Mathf.Abs(Mathf.RoundToInt(selectedObjecRotation.y)) == 270)
+                {
+                    vertialOffset.y = (-hitObjScale.y - selectedObjDimentions.y) / 2;
+                }
+                else
+                {
+                    SelectedObjectHandler.Instance.RotateSelectedObject(buildingScriptableObject, visual);
+                }
+            }
+        }
         objHitPos = objHitPos.normalized;
 
         Vector3 hitObjectDimention = GetRotateObjectDimention(hitObjScale, hitObjRot);
 
-        Vector3 offset = (selectedObjDimentions + hitObjectDimention) / 2;
+        Vector3 horizontalOffset = (selectedObjDimentions + hitObjectDimention) / 2;
 
         Vector3 finalPosition = hitObjPos;
-        finalPosition.x += offset.x * objHitPos.x;
-        finalPosition.y += offset.y - hitObjectDimention.y;
-        finalPosition.z += offset.z * objHitPos.z;
+        finalPosition.x += horizontalOffset.x * objHitPos.x;
+        finalPosition.y += vertialOffset.y;
+        finalPosition.z += horizontalOffset.z * objHitPos.z;
 
         return finalPosition;
     }
@@ -252,6 +502,11 @@ public class BuildingSystem : MonoBehaviour
         Vector3 selectedObjDimentions = buildingScriptableObject.currentDimention;
         Vector3 hitObjScale = referenceObject.localScale;
         Vector3 hitObjRot = referenceObject.rotation.eulerAngles;
+
+        if (visual.localRotation != referenceObject.rotation)
+        {
+            SelectedObjectHandler.Instance.RotateSelectedObject(buildingScriptableObject, visual);
+        }
 
         Vector3 horizontalHitDirection = new Vector3(objHitPos.x, 0, objHitPos.z);
         Vector3 vertialHitDirection = new Vector3(0, objHitPos.y, 0);
@@ -265,29 +520,29 @@ public class BuildingSystem : MonoBehaviour
         Vector3 dir = Vector3.zero;
         if (normal.y > 0)
         {
-            if (vertialHitDirection.y > 0.2f)
+            if (vertialHitDirection.y > 0.050f)
             {
-                if (Mathf.RoundToInt(normal.x) == 0)
+                if (normal.x > -0.1f && normal.x < 0.1f)
                 {
                     dir.x = 0;
                     if (normal.z < 0) { dir.z = 1; } else { dir.z = -1; }
                 }
-                if (Mathf.RoundToInt(normal.z) == 0)
+                if (normal.z > -0.1f && normal.z < 0.1f)
                 {
                     dir.z = 0;
                     if (normal.x < 0) { dir.x = 1; } else { dir.x = -1; }
                 }
                 finalPosition.y += offset.y;
             }
-            else if (vertialHitDirection.y < -0.2f)
+            else if (vertialHitDirection.y < -0.050f)
             {
-                if (Mathf.RoundToInt(normal.x) == 0)
+                if (normal.x > -0.1f && normal.x < 0.1f)
                 {
                     dir.x = 0;
                     if (normal.z > 0) { dir.z = 1; } else { dir.z = -1; }
 
                 }
-                if (Mathf.RoundToInt(normal.z) == 0)
+                if (normal.z > -0.1f && normal.z < 0.1f)
                 {
                     dir.z = 0;
                     if (normal.x > 0) { dir.x = 1; } else { dir.x = -1; }
@@ -296,13 +551,13 @@ public class BuildingSystem : MonoBehaviour
             }
             else
             {
-                if (Mathf.RoundToInt(normal.x) == 0)
+                if (normal.x > -0.1f && normal.x < 0.1f)
                 {
                     horizontalHitDirection.z = 0;
                     horizontalHitDirection.x = Mathf.Sign(objHitPos.x) * 1;
 
                 }
-                if (Mathf.RoundToInt(normal.z) == 0)
+                if (normal.z > -0.1f && normal.z < 0.1f)
                 {
                     horizontalHitDirection.x = 0;
                     horizontalHitDirection.z = Mathf.Sign(objHitPos.z) * 1;
@@ -347,6 +602,11 @@ public class BuildingSystem : MonoBehaviour
             case BuildingTypes.BuildingType.Columns:
                 Columns.columns.Add(prefab);
                 break;
+            case BuildingTypes.BuildingType.Ramps:
+                if (prefab.transform.name.Contains("Ramp 15")) { Ramps15.ramps15.Add(prefab); } 
+                if (prefab.transform.name.Contains("Ramp 30")) { Ramps30.ramps30.Add(prefab); }
+                if (prefab.transform.name.Contains("Ramp 45")) { Ramps45.ramps45.Add(prefab); }
+                break;
         }
     }
 
@@ -358,10 +618,13 @@ public class BuildingSystem : MonoBehaviour
             switch (BuildingTypes.Instance.buildingType)
             {
                 case BuildingTypes.BuildingType.Platforms:
-                    Platforms.platforms.Remove(this.transform);
+                    Platforms.platforms.Remove(prefab);
                     break;
                 case BuildingTypes.BuildingType.Columns:
-                    Columns.columns.Remove(this.transform);
+                    Columns.columns.Remove(prefab);
+                    break;
+                case BuildingTypes.BuildingType.Ramps:
+                    Ramps15.ramps15.Remove(prefab);
                     break;
             }
             obj.DestroySelf();

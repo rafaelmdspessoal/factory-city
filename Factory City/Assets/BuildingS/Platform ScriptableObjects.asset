@@ -10,11 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ee95fe36c94ec3d469416125147f470d, type: 3}
-  m_Name: Platform_10x100x100_ScriptableObjects
+  m_Name: Platform ScriptableObjects
   m_EditorClassIdentifier: 
-  prefab: {fileID: 2106882994946784591, guid: 115f02b431028e440a3b3c17f2248691, type: 3}
-  visual: {fileID: 8329102595451250992, guid: a001dee2286c2d1428e04c5627dd54c1, type: 3}
+  prefab: {fileID: 27238054261933908, guid: 7bc6a0e762ae57c4f9c26e17f6d5b74c, type: 3}
+  visual: {fileID: 6139775238654346327, guid: 67506cca9a9d0c14aa4c5116cbeb42d9, type: 3}
   dimention: {x: 1, y: 0.1, z: 1}
   currentDimention: {x: 1, y: 0.1, z: 1}
-  columnName: Platform 10x100x100
+  columnName: Platform
   buildingRotation: 2
+  cantBuildColor: {r: 1, g: 0, b: 0, a: 0}
+  visualColor: {r: 0.9433962, g: 0.9433962, b: 0.9433962, a: 0}

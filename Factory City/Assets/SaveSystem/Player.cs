@@ -11,7 +11,6 @@ public class Player : MonoBehaviour, ISaveable
 
     public void PopulateSaveData(SaveData saveData)
     {
-        SaveData.PlayerData playerData = new SaveData.PlayerData();
         saveData.playerData.playerCapsulePosition = playerCapsule.position;
         saveData.playerData.playerCapsuleRotation = playerCapsule.localRotation;
 

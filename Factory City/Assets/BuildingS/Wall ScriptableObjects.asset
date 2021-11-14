@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ee95fe36c94ec3d469416125147f470d, type: 3}
-  m_Name: ColumnsScriptableObjects
+  m_Name: Wall ScriptableObjects
   m_EditorClassIdentifier: 
-  prefab: {fileID: 8114786228925144399, guid: ea96ff3030ad46841b8e671ed23c74ac, type: 3}
-  visual: {fileID: 3298728285929617151, guid: bd8f97c05219faf4abe620eef40658a0, type: 3}
-  dimention: {x: 0.1, y: 3, z: 0.1}
-  currentDimention: {x: 0.1, y: 3, z: 0.1}
-  columnName: Column 3
-  buildingRotation: 0
+  prefab: {fileID: 3193552020380897287, guid: 088c38374d3006d44a9c1b1d3a6ccf95, type: 3}
+  visual: {fileID: 2694555199145963215, guid: f0439902d3ef2ef4fbc61b43c52f8670, type: 3}
+  dimention: {x: 0.1, y: 1, z: 1}
+  currentDimention: {x: 1, y: 1, z: 0.1}
+  columnName: Wall
+  buildingRotation: 1
   cantBuildColor: {r: 1, g: 0, b: 0, a: 0}
   visualColor: {r: 1, g: 1, b: 1, a: 0}

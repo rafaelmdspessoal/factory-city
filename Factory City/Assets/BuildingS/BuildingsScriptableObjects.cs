@@ -11,11 +11,14 @@ public class BuildingsScriptableObjects : ScriptableObject
     public Vector3 currentDimention;
     public string columnName;
     public BuildingRotation buildingRotation;
+    public Color cantBuildColor;
+    public Color visualColor;
 
-    void Awake()
+    void Start()
     {
         buildingRotation = BuildingRotation.Zero;
         currentDimention = dimention;
+        visualColor = visual.GetComponent<Renderer>().material.color;
     }
 
     public BuildingRotation GetNextRotation()

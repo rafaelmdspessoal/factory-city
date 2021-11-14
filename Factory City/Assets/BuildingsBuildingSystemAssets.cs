@@ -13,5 +13,8 @@ public class BuildingsBuildingSystemAssets : MonoBehaviour
 
     public BuildingsScriptableObjects platform;
     public BuildingsScriptableObjects column;
-    public BuildingsScriptableObjects ramp;
+    public BuildingsScriptableObjects wall;
+    public BuildingsScriptableObjects ramp15;
+    public BuildingsScriptableObjects ramp30;
+    public BuildingsScriptableObjects ramp45;
 }
