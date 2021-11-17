@@ -1,19 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
-using System;
 
-public class HandleObjectCreationDestruction : MonoBehaviour, IManipulable
+[System.Serializable]
+public class Door : MonoBehaviour, IManipulable
 {
     public void DestroySelf()
     {
+        Doors.doors.Remove(transform);
         Destroy(transform.gameObject);
         print("Destroy");
     }
 
     public void CreateSelf()
     {
+        Doors.doors.Add(transform);
         print("Create");
     }
 }

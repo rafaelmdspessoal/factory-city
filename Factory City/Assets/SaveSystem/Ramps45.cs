@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
 public class Ramps45 : MonoBehaviour, ISaveable
 {
     public static List<Transform> ramps45 = new List<Transform>();
@@ -13,6 +12,7 @@ public class Ramps45 : MonoBehaviour, ISaveable
         {
             SaveData.Ramp45Data ramp45Data = new SaveData.Ramp45Data();
             ramp45Data.position = ramp45.position;
+            ramp45Data.scale = ramp45.localScale;
             ramp45Data.rotation = ramp45.localRotation;
             saveData.ramp45Data.Add(ramp45Data);
         }
@@ -20,13 +20,19 @@ public class Ramps45 : MonoBehaviour, ISaveable
 
     public void LoadFromSaveData(SaveData saveData)
     {
-        foreach (SaveData.Ramp45Data ramps45Data in saveData.ramp45Data)
+        foreach (Transform obj in ramps45)
         {
-            Instantiate(
+            obj.GetComponent<Ramp45>().DestroySelf();
+        }
+        foreach (SaveData.Ramp45Data ramp45Data in saveData.ramp45Data)
+        {
+            Transform ramp45 = Instantiate(
                 BuildingsBuildingSystemAssets.Instance.ramp45.prefab,
-                ramps45Data.position,
-                ramps45Data.rotation
-            );
+                ramp45Data.position,
+                ramp45Data.rotation
+                        );
+            ramp45.localScale = ramp45Data.scale;
+            ramp45.GetComponent<IManipulable>().CreateSelf();
         }
     }
 }

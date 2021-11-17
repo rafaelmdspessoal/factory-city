@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
 public class Platforms : MonoBehaviour, ISaveable
 {
     public static List<Transform> platforms = new List<Transform>();
@@ -13,6 +12,7 @@ public class Platforms : MonoBehaviour, ISaveable
         {
             SaveData.PlatformData platformData = new SaveData.PlatformData();
             platformData.position = platform.position;
+            platformData.scale = platform.localScale;
             platformData.rotation = platform.localRotation;
             saveData.platformData.Add(platformData);
         }
@@ -20,13 +20,19 @@ public class Platforms : MonoBehaviour, ISaveable
 
     public void LoadFromSaveData(SaveData saveData)
     {
+        foreach (Transform obj in platforms)
+        {
+            obj.GetComponent<Platform>().DestroySelf();
+        }
         foreach (SaveData.PlatformData platformData in saveData.platformData)
         {
-            Instantiate(
+            Transform platform = Instantiate(
                 BuildingsBuildingSystemAssets.Instance.platform.prefab,
                 platformData.position,
                 platformData.rotation
-            );
+                        );
+            platform.localScale = platformData.scale;
+            platform.GetComponent<IManipulable>().CreateSelf();
         }
     }
 }

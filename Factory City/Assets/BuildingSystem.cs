@@ -53,6 +53,7 @@ public class BuildingSystem : MonoBehaviour
             visual.GetComponent<Renderer>().material.color = buildingScriptableObject.visualColor;
 
             RotateSelectedObject(buildingScriptableObject, visual);
+            ScaleSelectedObject(buildingScriptableObject, visual);
             canBuild = CanBuild(visual);
             if (!canBuild)
             {
@@ -64,6 +65,15 @@ public class BuildingSystem : MonoBehaviour
                 mousePos = raycastHit.point;
                 Transform hitTransform = raycastHit.transform;
                 LayerMask layer = raycastHit.transform.gameObject.layer;
+
+                if (layer == 9)
+                {
+                    visualsPos = new Vector3(
+                        Mathf.RoundToInt(mousePos.x),
+                        buildingScriptableObject.currentDimention.y / 2,
+                        Mathf.RoundToInt(mousePos.z)
+                    );
+                }
 
                 switch (BuildingTypes.Instance.buildingType)
                 {
@@ -85,7 +95,7 @@ public class BuildingSystem : MonoBehaviour
                         {  
                             visualsPos = new Vector3(
                                 Mathf.RoundToInt(mousePos.x),
-                                buildingScriptableObject.dimention.y / 2,
+                                buildingScriptableObject.currentDimention.y / 2,
                                 Mathf.RoundToInt(mousePos.z)
                             );
                         }
@@ -108,14 +118,6 @@ public class BuildingSystem : MonoBehaviour
                         {
                             visualsPos = GetColumnPositionToBuildPlatform(hitTransform, mousePos);
                         }
-                        else if (layer == 9)
-                        {
-                            visualsPos = new Vector3(
-                                Mathf.RoundToInt(mousePos.x),
-                                buildingScriptableObject.dimention.y / 2,
-                                Mathf.RoundToInt(mousePos.z)
-                            ); 
-                        }
                         else if (layer == 10)
                         {
                             visualsPos = GetRampPositionToBuildRamp(hitTransform, raycastHit.normal, mousePos);
@@ -131,17 +133,9 @@ public class BuildingSystem : MonoBehaviour
                         {
                             visualsPos = GetPlatformPositionToBuildColumn(hitTransform, mousePos);
                         }
-                        else if (layer == 9)
-                        {
-                            visualsPos = new Vector3(
-                                Mathf.RoundToInt(mousePos.x),
-                                buildingScriptableObject.dimention.y / 2,
-                                Mathf.RoundToInt(mousePos.z)
-                            );
-                        }
                         break;
                     case BuildingTypes.BuildingType.Walls:
-                        if (layer != 7 && layer != 9 && layer != 11)
+                        if (layer != 7 && layer != 9 && layer != 11 && layer != 12)
                         {
                             canBuild = false;
                             visual.GetComponent<Renderer>().material.color = buildingScriptableObject.cantBuildColor;
@@ -150,15 +144,30 @@ public class BuildingSystem : MonoBehaviour
                         {
                             visualsPos = GetPlatformPositionToBuildWall(hitTransform, mousePos);
                         }
-                        else if (layer == 9)
+                        else if (layer == 11)
                         {
-                            visualsPos = new Vector3(
-                                Mathf.RoundToInt(mousePos.x),
-                                buildingScriptableObject.dimention.y / 2,
-                                Mathf.RoundToInt(mousePos.z)
-                            );
+                            visualsPos = GetdWallPositionToBuilddWall(hitTransform, mousePos);
+                        }
+                        else if (layer == 12)
+                        {
+                            visualsPos = GetdWallPositionToBuilddWall(hitTransform, mousePos);
+                        }
+                        break;
+                    case BuildingTypes.BuildingType.Doors:
+                        if (layer != 7 && layer != 9 && layer != 11 && layer != 12)
+                        {
+                            canBuild = false;
+                            visual.GetComponent<Renderer>().material.color = buildingScriptableObject.cantBuildColor;
+                        }
+                        if (layer == 7)
+                        {
+                            visualsPos = GetPlatformPositionToBuildWall(hitTransform, mousePos);
                         }
                         else if (layer == 11)
+                        {
+                            visualsPos = GetdWallPositionToBuilddWall(hitTransform, mousePos);
+                        }
+                        else if (layer == 12)
                         {
                             visualsPos = GetdWallPositionToBuilddWall(hitTransform, mousePos);
                         }
@@ -177,7 +186,7 @@ public class BuildingSystem : MonoBehaviour
             {
                 if (canBuild)
                 {
-                    CreateSelectedObjectPrefab(buildingScriptableObject, visualsPos, visual.rotation);
+                    CreateSelectedObjectPrefab(buildingScriptableObject, visualsPos, visual.rotation, visual.localScale);
                 }
                 else
                 {
@@ -245,7 +254,10 @@ public class BuildingSystem : MonoBehaviour
         Vector3 objHitPos = (mousePosition - hitObjPos);
         Vector3 hitObjRot = referenceObject.rotation.eulerAngles;
         Vector3 hitObjScale = referenceObject.localScale;
-        Vector3 selectedObjDimentions = buildingScriptableObject.currentDimention;
+        Vector3 selectedObjDimentions = GetRotateObjectDimention(
+            buildingScriptableObject.currentDimention,
+            buildingScriptableObject.currentRotation
+            );
         Vector3 hitObjectDimention = GetRotateObjectDimention(hitObjScale, hitObjRot);
 
         Vector3 offset = (selectedObjDimentions + hitObjectDimention) / 2;
@@ -359,13 +371,16 @@ public class BuildingSystem : MonoBehaviour
     {
         Vector3 hitObjPos = referenceObject.position;
         Vector3 objHitPos = (mousePosition - hitObjPos);
-        Vector3 selectedObjDimentions = buildingScriptableObject.currentDimention;
         Vector3 hitObjScale = referenceObject.localScale;
         Vector3 hitObjRot = referenceObject.rotation.eulerAngles;
 
-        if (visual.localRotation != referenceObject.rotation)
+        if (visual.localRotation.eulerAngles.y != referenceObject.rotation.eulerAngles.y)
         {
-            SelectedObjectHandler.Instance.RotateSelectedObject(buildingScriptableObject, visual);
+            if (visual.localRotation.eulerAngles.y != referenceObject.rotation.eulerAngles.y + 180 &&
+                visual.localRotation.eulerAngles.y != referenceObject.rotation.eulerAngles.y - 180)
+            {   
+                SelectedObjectHandler.Instance.RotateSelectedObject(buildingScriptableObject, visual);
+            }
         }
 
         Vector3 horizontalHitDirection = new Vector3(objHitPos.x, 0, objHitPos.z);
@@ -373,6 +388,11 @@ public class BuildingSystem : MonoBehaviour
 
         Vector3 hitObjectDimention = GetRotateObjectDimention(hitObjScale, hitObjRot);
         hitObjectDimention.y = hitObjScale.y;
+
+        Vector3 selectedObjDimentions = GetRotateObjectDimention(
+            buildingScriptableObject.currentDimention,
+            buildingScriptableObject.currentRotation
+            );
         Vector3 offset = (selectedObjDimentions + hitObjectDimention) / 2;
 
         Vector3 finalPosition = hitObjPos;
@@ -589,25 +609,11 @@ public class BuildingSystem : MonoBehaviour
         return rotatedObjectDimention;
     }
 
-    public void CreateSelectedObjectPrefab(BuildingsScriptableObjects obj, Vector3 pos, Quaternion rot)
+    public void CreateSelectedObjectPrefab(BuildingsScriptableObjects obj, Vector3 pos, Quaternion rot, Vector3 scale)
     {
-        Transform prefab = Instantiate(obj.prefab, pos, Quaternion.identity);
-        prefab.rotation = rot;
+        Transform prefab = Instantiate(obj.prefab, pos, rot);
+        prefab.localScale = scale;
         prefab.GetComponent<IManipulable>().CreateSelf();
-        switch (BuildingTypes.Instance.buildingType)
-        {
-            case BuildingTypes.BuildingType.Platforms:
-                Platforms.platforms.Add(prefab);
-                break;
-            case BuildingTypes.BuildingType.Columns:
-                Columns.columns.Add(prefab);
-                break;
-            case BuildingTypes.BuildingType.Ramps:
-                if (prefab.transform.name.Contains("Ramp 15")) { Ramps15.ramps15.Add(prefab); } 
-                if (prefab.transform.name.Contains("Ramp 30")) { Ramps30.ramps30.Add(prefab); }
-                if (prefab.transform.name.Contains("Ramp 45")) { Ramps45.ramps45.Add(prefab); }
-                break;
-        }
     }
 
     public void DestroyObjectPrefab(Transform prefab)
@@ -615,18 +621,6 @@ public class BuildingSystem : MonoBehaviour
         IManipulable obj = prefab.GetComponent<IManipulable>();
         if (obj != null)
         {
-            switch (BuildingTypes.Instance.buildingType)
-            {
-                case BuildingTypes.BuildingType.Platforms:
-                    Platforms.platforms.Remove(prefab);
-                    break;
-                case BuildingTypes.BuildingType.Columns:
-                    Columns.columns.Remove(prefab);
-                    break;
-                case BuildingTypes.BuildingType.Ramps:
-                    Ramps15.ramps15.Remove(prefab);
-                    break;
-            }
             obj.DestroySelf();
         }
     }
@@ -644,11 +638,27 @@ public class BuildingSystem : MonoBehaviour
         buildingScriptableObject = null;
     }
 
-    void RotateSelectedObject(BuildingsScriptableObjects selectedSO, Transform selectedObj)
+    private void RotateSelectedObject(BuildingsScriptableObjects selectedSO, Transform selectedObj)
     {
         if (Input.GetKeyDown(KeyCode.R) && selectedSO != null)
         {
             SelectedObjectHandler.Instance.RotateSelectedObject(selectedSO, selectedObj);
+        }
+    }
+
+    private void ScaleSelectedObject(BuildingsScriptableObjects selectedSO, Transform selectedObj)
+    {
+        if (Input.GetKey(KeyCode.LeftShift) && selectedSO != null)
+        {
+            if (Input.GetAxis("Mouse ScrollWheel") > 0)
+            {
+                selectedSO.GetNextScale();
+            }
+            else if (Input.GetAxis("Mouse ScrollWheel") < 0)
+            {
+                selectedSO.GetPreviousScale();
+            }
+            SelectedObjectHandler.Instance.ScaleSelectedObject(selectedSO, selectedObj);
         }
     }
 

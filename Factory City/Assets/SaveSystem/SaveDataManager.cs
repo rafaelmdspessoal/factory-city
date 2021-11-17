@@ -10,7 +10,6 @@ public static class SaveDataManager
         {
             saveable.PopulateSaveData(sd);
         }
-        Debug.Log(sd.ToJson());
 
         if (FileManager.WriteToFile("SaveData01.dat", sd.ToJson()))
         {

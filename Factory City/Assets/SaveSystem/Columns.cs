@@ -13,6 +13,7 @@ public class Columns : MonoBehaviour, ISaveable
         {
             SaveData.ColumnData columnData = new SaveData.ColumnData();
             columnData.position = column.position;
+            columnData.scale = column.localScale;
             columnData.rotation = column.localRotation;
             saveData.columnData.Add(columnData);
         }
@@ -20,13 +21,19 @@ public class Columns : MonoBehaviour, ISaveable
 
     public void LoadFromSaveData(SaveData saveData)
     {
+        foreach (Transform obj in columns)
+        {
+            obj.GetComponent<Column>().DestroySelf();
+        }
         foreach (SaveData.ColumnData columnData in saveData.columnData)
         {
-            Instantiate(
+            Transform column = Instantiate(
                 BuildingsBuildingSystemAssets.Instance.column.prefab,
                 columnData.position,
                 columnData.rotation
-            );
+                        );
+            column.localScale = columnData.scale;
+            column.GetComponent<IManipulable>().CreateSelf();
         }
     }
 }
