@@ -14,9 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefab: {fileID: 5483361896272763191, guid: eed1145d74183d247a87bd753d82b7fb, type: 3}
   visual: {fileID: 246819894622995204, guid: 392f3d5cdd1d20a4ab143b9060e24dd7, type: 3}
-  dimention: {x: 0.1, y: 2, z: 1.5}
-  currentDimention: {x: 0.1, y: 2, z: 1.5}
+  dimention: {x: 0.1, y: 2, z: 1}
+  currentDimention: {x: 0.1, y: 2, z: 1}
+  scalableDimentions: {x: 0, y: 0, z: 0}
+  currentRotation: {x: 0, y: 0, z: 0}
   columnName: Door
   buildingRotation: 0
+  buildingScale: 4
   cantBuildColor: {r: 1, g: 0, b: 0, a: 0}
   visualColor: {r: 1, g: 1, b: 1, a: 0}

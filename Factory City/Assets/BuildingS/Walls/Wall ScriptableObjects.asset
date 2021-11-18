@@ -15,8 +15,11 @@ MonoBehaviour:
   prefab: {fileID: 3193552020380897287, guid: 088c38374d3006d44a9c1b1d3a6ccf95, type: 3}
   visual: {fileID: 2694555199145963215, guid: f0439902d3ef2ef4fbc61b43c52f8670, type: 3}
   dimention: {x: 0.1, y: 1, z: 1}
-  currentDimention: {x: 1, y: 1, z: 0.1}
+  currentDimention: {x: 0.1, y: 2, z: 2}
+  scalableDimentions: {x: 0, y: 1, z: 1}
+  currentRotation: {x: 0, y: 270, z: 0}
   columnName: Wall
-  buildingRotation: 1
+  buildingRotation: 3
+  buildingScale: 2
   cantBuildColor: {r: 1, g: 0, b: 0, a: 0}
   visualColor: {r: 1, g: 1, b: 1, a: 0}

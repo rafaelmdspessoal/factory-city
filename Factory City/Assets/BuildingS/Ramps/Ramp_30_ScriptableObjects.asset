@@ -16,7 +16,10 @@ MonoBehaviour:
   visual: {fileID: 8787850363663882606, guid: 88af143bfd982974faccedb52b535501, type: 3}
   dimention: {x: 1, y: 0.6666667, z: 1}
   currentDimention: {x: 1, y: 0.6666667, z: 1}
+  scalableDimentions: {x: 0, y: 0, z: 1}
+  currentRotation: {x: 0, y: 0, z: 0}
   columnName: Ramp 30
   buildingRotation: 0
+  buildingScale: 0
   cantBuildColor: {r: 1, g: 0, b: 0, a: 0}
   visualColor: {r: 1, g: 1, b: 1, a: 0}
