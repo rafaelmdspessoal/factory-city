@@ -6,6 +6,12 @@ TagManager:
   tags:
   - CinemachineTarget
   - Ground
+  - Tree
+  - Storage
+  - Machinery
+  - Resource
+  - Load Station
+  - Unload Station
   layers:
   - Default
   - TransparentFX
@@ -20,7 +26,7 @@ TagManager:
   - Ramps
   - Wall
   - Door
-  - 
+  - Machines
   - 
   - 
   - 

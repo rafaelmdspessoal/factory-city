@@ -15,10 +15,11 @@ MonoBehaviour:
   prefab: {fileID: 27238054261933908, guid: 7bc6a0e762ae57c4f9c26e17f6d5b74c, type: 3}
   visual: {fileID: 6139775238654346327, guid: 67506cca9a9d0c14aa4c5116cbeb42d9, type: 3}
   dimention: {x: 1, y: 0.1, z: 1}
-  currentDimention: {x: 2.0769187e+34, y: 2.0769188e+33, z: 2.0769187e+34}
+  currentDimention: {x: 1, y: 0.1, z: 1}
   scalableDimentions: {x: 1, y: 0, z: 1}
+  currentRotation: {x: 0, y: 0, z: 0}
   columnName: Platform
-  buildingRotation: 3
-  buildingScale: 4
+  buildingRotation: 0
+  buildingScale: 1
   cantBuildColor: {r: 1, g: 0, b: 0, a: 0}
   visualColor: {r: 0.9433962, g: 0.9433962, b: 0.9433962, a: 0}

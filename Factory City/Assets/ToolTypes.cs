@@ -17,7 +17,7 @@ public class ToolTypes : MonoBehaviour
     public enum Tools
     {
         Builder,
-        bulldozer,
+        Bulldozer,
         Axe,
     };
 

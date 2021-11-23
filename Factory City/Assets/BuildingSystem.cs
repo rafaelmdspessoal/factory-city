@@ -69,9 +69,9 @@ public class BuildingSystem : MonoBehaviour
                 if (layer == 9)
                 {
                     visualsPos = new Vector3(
-                        Mathf.RoundToInt(mousePos.x),
+                        mousePos.x,
                         buildingScriptableObject.currentDimention.y / 2,
-                        Mathf.RoundToInt(mousePos.z)
+                        mousePos.z
                     );
                 }
 
@@ -90,14 +90,6 @@ public class BuildingSystem : MonoBehaviour
                         else if (layer == 8)
                         {
                             visualsPos = GetColumnPositionToBuildPlatform(hitTransform, mousePos);
-                        }
-                        else if (layer == 9)
-                        {  
-                            visualsPos = new Vector3(
-                                Mathf.RoundToInt(mousePos.x),
-                                buildingScriptableObject.currentDimention.y / 2,
-                                Mathf.RoundToInt(mousePos.z)
-                            );
                         }
                         else if (layer == 10)
                         {
@@ -172,6 +164,17 @@ public class BuildingSystem : MonoBehaviour
                             visualsPos = GetdWallPositionToBuilddWall(hitTransform, mousePos);
                         }
                         break;
+                    case BuildingTypes.BuildingType.Machines:
+                        DetectCollision nearbyColliders = visual.GetComponent<DetectCollision>();
+                        foreach(Collider collider in nearbyColliders.nearbyColliders)
+                        {
+                            if (collider.tag == "Storage")
+                            {
+                                visual.GetComponent<Renderer>().material.color = Color.green;
+                                break;
+                            }
+                        }
+                        break;
                 }
 
                 visual.position = visualsPos;
@@ -206,9 +209,13 @@ public class BuildingSystem : MonoBehaviour
         Vector3 hitObjPos = referenceObject.position;
         Vector3 objHitPos = (mousePosition - hitObjPos);
         Vector3 hitObjRot = referenceObject.rotation.eulerAngles;
-        Vector3 selectedObjDimentions = buildingScriptableObject.currentDimention;
         Vector3 hitObjScale = referenceObject.localScale;
         Vector3 finalPosition = hitObjPos;
+
+        Vector3 selectedObjDimentions = GetRotateObjectDimention(
+            buildingScriptableObject.currentDimention,
+            buildingScriptableObject.currentRotation
+            );
 
         Vector3 hitObjectDimention = GetRotateObjectDimention(hitObjScale, hitObjRot);
         Vector3 offset = (selectedObjDimentions + hitObjectDimention) / 2;
@@ -230,8 +237,12 @@ public class BuildingSystem : MonoBehaviour
         Vector3 objHitPos = (mousePosition - hitObjPos);
         Vector3 hitObjRot = referenceObject.rotation.eulerAngles;
         Vector3 hitObjScale = referenceObject.localScale;
-        Vector3 selectedObjDimentions = buildingScriptableObject.currentDimention;
         Vector3 hitObjectDimention = GetRotateObjectDimention(hitObjScale, hitObjRot);
+
+        Vector3 selectedObjDimentions = GetRotateObjectDimention(
+            buildingScriptableObject.currentDimention,
+            buildingScriptableObject.currentRotation
+            );
 
         Vector3 offset = (selectedObjDimentions + hitObjectDimention) / 2;
 
@@ -294,9 +305,13 @@ public class BuildingSystem : MonoBehaviour
     {     
         Vector3 hitObjPos = referenceObject.position;
         Vector3 objHitPos = (mousePosition - hitObjPos);
-        Vector3 selectedObjDimentions = buildingScriptableObject.currentDimention;
         Vector3 hitObjScale = referenceObject.localScale;
         Vector3 hitObjRot = referenceObject.rotation.eulerAngles;
+
+        Vector3 selectedObjDimentions = GetRotateObjectDimention(
+            buildingScriptableObject.currentDimention,
+            buildingScriptableObject.currentRotation
+            );
 
         objHitPos.y = 0;
         if (Mathf.Abs(objHitPos.x) > Mathf.Abs(objHitPos.z)) { objHitPos.z = 0; } else { objHitPos.x = 0; }
@@ -318,12 +333,14 @@ public class BuildingSystem : MonoBehaviour
     {
         Vector3 hitObjPos = referenceObject.position;
         Vector3 objHitPos = (mousePosition - hitObjPos);
-        Vector3 selectedObjDimentions = buildingScriptableObject.currentDimention;
         Vector3 hitObjScale = referenceObject.localScale;
         Vector3 hitObjRot = referenceObject.rotation.eulerAngles;
 
         Vector3 vertialHitDirection = new Vector3(0, objHitPos.y, 0);
-
+        Vector3 selectedObjDimentions = GetRotateObjectDimention(
+            buildingScriptableObject.currentDimention,
+            buildingScriptableObject.currentRotation
+            );
         Vector3 hitObjectDimention = GetRotateObjectDimention(hitObjScale, hitObjRot);
         hitObjectDimention.y = hitObjScale.y;
         Vector3 offset = (selectedObjDimentions + hitObjectDimention) / 2;
@@ -427,11 +444,13 @@ public class BuildingSystem : MonoBehaviour
     {
         Vector3 hitObjPos = referenceObject.position;
         Vector3 objHitPos = (mousePosition - hitObjPos);
-        Vector3 selectedObjDimentions = buildingScriptableObject.currentDimention;
         Vector3 selectedObjecRotation = visual.localRotation.eulerAngles;
         Vector3 hitObjScale = referenceObject.localScale;
         Vector3 hitObjRot = referenceObject.rotation.eulerAngles;
-
+        Vector3 selectedObjDimentions = GetRotateObjectDimention(
+            buildingScriptableObject.currentDimention,
+            buildingScriptableObject.currentRotation
+            );
         Vector3 vertialOffset = Vector3.zero;
         objHitPos.y = 0;
         if (Mathf.Abs(objHitPos.x) > Mathf.Abs(objHitPos.z)) {
@@ -519,10 +538,12 @@ public class BuildingSystem : MonoBehaviour
     {
         Vector3 hitObjPos = referenceObject.position;
         Vector3 objHitPos = (mousePosition - hitObjPos);
-        Vector3 selectedObjDimentions = buildingScriptableObject.currentDimention;
         Vector3 hitObjScale = referenceObject.localScale;
         Vector3 hitObjRot = referenceObject.rotation.eulerAngles;
-
+        Vector3 selectedObjDimentions = GetRotateObjectDimention(
+            buildingScriptableObject.currentDimention,
+            buildingScriptableObject.currentRotation
+            );
         if (visual.localRotation != referenceObject.rotation)
         {
             SelectedObjectHandler.Instance.RotateSelectedObject(buildingScriptableObject, visual);
@@ -630,6 +651,10 @@ public class BuildingSystem : MonoBehaviour
         if (visual != null) { Destroy(visual.gameObject); }
         buildingScriptableObject = selectedSO;
         visual = Instantiate(buildingScriptableObject.visual);
+        selectedSO.currentDimention = selectedSO.dimention;
+        selectedSO.currentRotation = Vector3.zero;
+        selectedSO.buildingRotation = BuildingsScriptableObjects.BuildingRotation.Zero;
+        selectedSO.buildingScale = BuildingsScriptableObjects.BuildingScale.One;
     }
 
     public void UnsetSelectedObject()

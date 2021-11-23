@@ -21,6 +21,7 @@ public class BuildingTypes : MonoBehaviour
         Columns,
         Ramps,
         Doors,
+        Machines,
     };
 
     private void Update()
@@ -61,6 +62,13 @@ public class BuildingTypes : MonoBehaviour
                 BuildingSystem.Instance.UnsetSelectedObject();
                 BuildingSystem.Instance.SetSelectedObject(BuildingsBuildingSystemAssets.Instance.door);
                 print("Door");
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha6))
+            {
+                buildingType = BuildingType.Machines;
+                BuildingSystem.Instance.UnsetSelectedObject();
+                BuildingSystem.Instance.SetSelectedObject(BuildingsBuildingSystemAssets.Instance.inboundStorage);
+                print("Machines");
             }
         }
     }

@@ -18,4 +18,8 @@ public class BuildingsBuildingSystemAssets : MonoBehaviour
     public BuildingsScriptableObjects ramp15;
     public BuildingsScriptableObjects ramp30;
     public BuildingsScriptableObjects ramp45;
+    public BuildingsScriptableObjects inboundStorage;
+    public BuildingsScriptableObjects outboundStorage;
+    public BuildingsScriptableObjects brikMacine;
+
 }

@@ -5,13 +5,13 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "BuildingsScriptableObjects", menuName = "ScriptableObjects/BuildingsScriptableObjects")]
 public class BuildingsScriptableObjects : ScriptableObject
 {
+    public string Name;
     public Transform prefab;
     public Transform visual;
     public Vector3 dimention;
     public Vector3 currentDimention;
     public Vector3 scalableDimentions;
     public Vector3 currentRotation;
-    public string columnName;
     public BuildingRotation buildingRotation;
     public BuildingScale buildingScale;
     public Color cantBuildColor;
@@ -31,8 +31,6 @@ public class BuildingsScriptableObjects : ScriptableObject
         switch (buildingRotation)
         {
             default:
-                buildingRotation = BuildingRotation.Zero;
-                return buildingRotation;
             case BuildingRotation.Zero:
                 buildingRotation = BuildingRotation.Ninety;
                 return buildingRotation;
@@ -53,8 +51,6 @@ public class BuildingsScriptableObjects : ScriptableObject
         switch (buildingScale)
         {
             default:
-                buildingScale = BuildingScale.One;
-                return buildingRotation;
             case BuildingScale.Four:
                 buildingScale = BuildingScale.Half;
                 return buildingRotation;
@@ -78,8 +74,6 @@ public class BuildingsScriptableObjects : ScriptableObject
         switch (buildingScale)
         {
             default:
-                buildingScale = BuildingScale.One;
-                return buildingRotation;
             case BuildingScale.Four:
                 buildingScale = BuildingScale.Three;
                 return buildingRotation;
