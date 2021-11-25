@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MachineOperator : MonoBehaviour
+public class Carrier : MonoBehaviour
 {
-    [SerializeField] private Transform operatorSpot;
+    [SerializeField] private Transform carrierSpot;
     private Transform workPlace;
     private Citizen citizen;
 
@@ -12,8 +12,8 @@ public class MachineOperator : MonoBehaviour
     {
         citizen = transform.GetComponent<Citizen>();
         workPlace = citizen.GetWorkPlace();
-        operatorSpot = workPlace.GetComponent<BrickMachine>().GetOperatorSpot();
-        citizen.SetDestinationObj(operatorSpot);
+        carrierSpot = workPlace.GetComponent<BrickMachine>().GetCarrierSpot();
+        citizen.SetDestinationObj(carrierSpot);
     }
 
     void Update()

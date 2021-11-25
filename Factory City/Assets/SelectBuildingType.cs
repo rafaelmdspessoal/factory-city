@@ -10,6 +10,7 @@ public class SelectBuildingType : MonoBehaviour
     [SerializeField] private GameObject[] wallsBtn;
     [SerializeField] private GameObject[] rampsBtn;
     [SerializeField] private GameObject[] machinesBtn;
+    [SerializeField] private GameObject[] storagesBtn;
 
     private void Start()
     {
@@ -47,6 +48,10 @@ public class SelectBuildingType : MonoBehaviour
                 else if (BuildingTypes.Instance.buildingType == BuildingTypes.BuildingType.Machines)
                 {
                     activateButtons(machinesBtn);
+                }
+                else if (BuildingTypes.Instance.buildingType == BuildingTypes.BuildingType.Storages)
+                {
+                    activateButtons(storagesBtn);
                 }
             }            
             else if (Input.GetKeyUp(KeyCode.Q))
@@ -97,6 +102,10 @@ public class SelectBuildingType : MonoBehaviour
         foreach (GameObject machineBtn in machinesBtn)
         {
             machineBtn.SetActive(false);
+        }
+        foreach (GameObject storageBtn in storagesBtn)
+        {
+            storageBtn.SetActive(false);
         }
     }
 }

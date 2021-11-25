@@ -165,14 +165,39 @@ public class BuildingSystem : MonoBehaviour
                         }
                         break;
                     case BuildingTypes.BuildingType.Machines:
-                        DetectCollision nearbyColliders = visual.GetComponent<DetectCollision>();
-                        foreach(Collider collider in nearbyColliders.nearbyColliders)
+                        if (layer != 7 && layer != 9 && layer != 11 && layer != 12 && layer != 13 && layer != 14 && layer != 15)
                         {
-                            if (collider.tag == "Storage")
+                            canBuild = false;
+                            visual.GetComponent<Renderer>().material.color = buildingScriptableObject.cantBuildColor;
+                        }
+                        
+                        if (canBuild)
+                        {
+                            DetectCollision detectCollision = visual.GetComponentInChildren<DetectCollision>();
+                            foreach (Transform objTransform in detectCollision.nearbyTransforms)
                             {
-                                visual.GetComponent<Renderer>().material.color = Color.green;
-                                break;
+                                if (objTransform.TryGetComponent<LoadStation>(out LoadStation loadStation))
+                                {
+                                    visual.GetComponent<Renderer>().material.color = Color.green;
+                                    break;
+                                }
+                                else if (objTransform.TryGetComponent<UnloadStation>(out UnloadStation unloadStation))
+                                {
+                                    visual.GetComponent<Renderer>().material.color = Color.blue;
+                                    break;
+                                }
                             }
+                        }
+                        break;
+                    case BuildingTypes.BuildingType.Storages:
+                        if (layer != 7 && layer != 9 && layer != 11 && layer != 12)
+                        {
+                            canBuild = false;
+                            visual.GetComponent<Renderer>().material.color = buildingScriptableObject.cantBuildColor;
+                        }
+                        else
+                        {
+
                         }
                         break;
                 }
@@ -689,7 +714,8 @@ public class BuildingSystem : MonoBehaviour
 
     private bool CanBuild(Transform ghostObject)
     {
-        DetectCollision collision = ghostObject.gameObject.GetComponent<DetectCollision>();
+        DetectCollision collision = ghostObject.GetChild(0).GetComponent<DetectCollision>();
+        print(collision.collided);
         if (collision.collided)
         {
             return false;

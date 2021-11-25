@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1711612608}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: DeliverySpot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: 7467269953227855834}
   - component: {fileID: 1666425581964206316}
   - component: {fileID: 5479014367634305701}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: LogStorage
   m_TagString: Storage
   m_Icon: {fileID: 0}
@@ -157,5 +157,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   deliverySpot: {fileID: 1711612608}
-  maxLogAmount: 100
+  workerSpot: {fileID: 0}
+  maxResourceAmount: 0
+  resourceAmount: 0
   acceptedResourceType: 00000000
+  allowedDeliverers: 0
+  worker: {fileID: 0}

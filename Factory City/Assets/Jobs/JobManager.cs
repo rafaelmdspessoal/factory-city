@@ -26,7 +26,7 @@ public class JobManager
     public static void RemoveJobSpot(int amount, Transform jobSpot)
     {
         jobAmount -= amount;
-        if (!jobSpot.GetComponent<IMachine>().HasJobSpot()) jobList.Remove(jobSpot);
+        if (!jobSpot.GetComponent<IHaveWorkers>().HasJobSpot()) jobList.Remove(jobSpot);
         if (OnJobChanged != null) OnJobChanged(null, EventArgs.Empty);
     }
 

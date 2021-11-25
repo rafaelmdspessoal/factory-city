@@ -1,9 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using CodeMonkey.Utils;
 
-public class BrickMachine : MonoBehaviour, IMachine, IManipulable
+public class BrickMachine : MonoBehaviour, IMachine, IManipulable, IHaveWorkers
 {
+    [SerializeField] private Transform operatorSpot;
+    [SerializeField] private Transform carrierSpot;
     [SerializeField] private int numWorkers;
     [SerializeField] private int numAcceptableResources;
     [SerializeField] private int numProducedResources;
@@ -12,14 +15,17 @@ public class BrickMachine : MonoBehaviour, IMachine, IManipulable
     [SerializeField] private ResourceManager.ResourceType[] acceptableResourceTypes;
     [SerializeField] private ResourceManager.ResourceType[] producedResourceTypes;
 
-    [SerializeField] private LoadStation[] unloadStation;
-    [SerializeField] private LoadStation[] loadStation;
+    [SerializeField] private List<UnloadStation> unloadStations;
+    [SerializeField] private List<LoadStation> loadStations;
 
     [SerializeField] private Transform actionArea;
 
+    [SerializeField] private List<Transform> stationsInReach;
     private List<Transform> resourcesInReach;
 
-       
+    
+
+
     void Start()
     {
         acceptableResourceTypes = new ResourceManager.ResourceType[numAcceptableResources];
@@ -32,25 +38,29 @@ public class BrickMachine : MonoBehaviour, IMachine, IManipulable
         JobManager.AddJobSpot(numWorkers, this.transform);
 
         resourcesInReach = new List<Transform>();
+        stationsInReach = new List<Transform>();
         GetResourcesInReach(acceptableResourceTypes);
     }
 
     void Update()
     {
-        
+
     }
 
     public void Hire(Citizen citizen)
     {
         for (int i = 0; i < numWorkers; i++)
         {
-            if (workers [i] == null)
+            if (workers[i] == null)
             {
                 workers[i] = citizen;
-                workers[i].gameObject.AddComponent<Miner>();
+                if (i == 0) workers[i].gameObject.AddComponent<MachineOperator>();
+                else if (i == 1) workers[i].gameObject.AddComponent<Carrier>();
+                else workers[i].gameObject.AddComponent<Miner>();
+
                 break;
             }
-        }     
+        }
         JobManager.RemoveJobSpot(1, transform);
         print("Worker Hired");
     }
@@ -61,7 +71,7 @@ public class BrickMachine : MonoBehaviour, IMachine, IManipulable
         {
             if (workers[i] == citizen) workers[i] = null;
         }
-        JobManager.RemoveJobSpot(1, transform);
+        JobManager.AddJobSpot(1, transform);
         print("Worker Fired");
     }
 
@@ -76,64 +86,77 @@ public class BrickMachine : MonoBehaviour, IMachine, IManipulable
 
     public void CreateSelf()
     {
-
+        FunctionTimer.Create(AddStationsInReach, 5);
     }
 
     public void DestroySelf()
     {
+        for (int i = 0; i < numWorkers; i++)
+        {
+            workers[i] = null;
+        }
+        JobManager.RemoveJobSpot(1, transform);
+        print("Facility destroyed");
+    }
 
+    public void GetStationsInReach(Transform station)
+    {
+        stationsInReach.Add(station);
+    }
+
+    public void RemoveStationsOutOfReach(Transform station)
+    {
+        stationsInReach.Remove(station);
+    }
+
+    public void AddStationsInReach()
+    {
+        foreach (Transform station in stationsInReach)
+        {
+            if (station.TryGetComponent<LoadStation>(out LoadStation loadStation))
+            {
+                loadStations.Add(loadStation);
+            }
+            else if (station.TryGetComponent<UnloadStation>(out UnloadStation unloadStation))
+            {
+                unloadStations.Add(unloadStation);
+            }
+        }
+        stationsInReach.Clear();
     }
 
     public LoadStation GetLoadStation()
     {
-        return loadStation[0];
+        return loadStations[0];
     }
 
-    public LoadStation GetUnloadStation()
+    public UnloadStation GetUnloadStation()
     {
-        return unloadStation[0];
-    }
-
-    private void GetLoadStationInReach(Transform loadStation)
-    {
-
-    }
-
-    private void GetUnloadStationInReach(Transform loadStation)
-    {
-
+        return unloadStations[0];
     }
 
     private void GetResourcesInReach(ResourceManager.ResourceType[] resourceTypes)
     {
         resourcesInReach = actionArea.GetComponent<ObjectsInReach>().GetResourcesInReach(resourceTypes);
     }
-
-    private void OnTriggerEnter(Collider collider)
+       
+    public Transform GetOperatorSpot()
     {
-        if (collider.tag == "Load Station")
-        {
-            print("Load Station in reach!");
-            GetLoadStationInReach(collider.transform);
-            transform.GetComponent<Renderer>().material.color = Color.green;
-        }
-        else if (collider.tag == "Unload Station")
-        {
-            print("Unload Station in reach!");
-            GetUnloadStationInReach(collider.transform);
-            transform.GetComponent<Renderer>().material.color = Color.blue;
-        }
-        else
-        {
-            transform.GetComponent<Renderer>().material.color = Color.white;
-        }
+        return operatorSpot;
     }
 
-    private void OnTriggerExit(Collider collider)
+    public Transform GetCarrierSpot()
     {
-        if (collider.tag == "Load Station" || collider.tag == "Unload Station")
-        {
-            transform.GetComponent<Renderer>().material.color = Color.white;
-        }
+        return carrierSpot;
+    }
+
+    private bool HasOperator()
+    {
+        return workers[0] != null;
+    }
+
+    private bool HasCarrier()
+    {
+        return workers[1] != null;
     }
 }

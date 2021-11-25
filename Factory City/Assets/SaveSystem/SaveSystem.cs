@@ -11,6 +11,7 @@ public class SaveSystem : MonoBehaviour
     {
         ResourceManager.Init();
         JobManager.Init();
+        PopulationManager.Init();
     }
 
     private void Update()

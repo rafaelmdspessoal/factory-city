@@ -10,5 +10,5 @@ public interface IStorage
 
     void SetMaxResourceAmount(int amount);
 
-    void SetResourcesToHold(ResourceManager.ResourceType[] resourceTypes);
+    void SetAlowedResources(ResourceManager.ResourceType[] resourceTypes);
 }

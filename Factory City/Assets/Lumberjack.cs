@@ -201,7 +201,7 @@ public class Lumberjack : MonoBehaviour, IHarvestResource
     private void ReturnToFacility()
     {
         print("Returning to facility");
-        Transform deliverySpot = deliveryStorage.GetComponent<Storage>().deliverySpot;
+        Transform deliverySpot = deliveryStorage.GetComponent<Storage>().GetDeliverySpot();
         citizen.SetDestinationObj(deliverySpot);
         currentState = State.DeliveringLogs;
     }

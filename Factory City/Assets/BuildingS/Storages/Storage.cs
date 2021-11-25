@@ -2,14 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Storage : MonoBehaviour, IStorage, IManipulable
+public class Storage : MonoBehaviour, IStorage, IManipulable, IHaveWorkers
 {
-    public Transform deliverySpot;
+    [SerializeField] private Transform deliverySpot;
+    [SerializeField] private Transform operatorSpot;
 
     [SerializeField] private int maxResourceAmount;
     [SerializeField] private int resourceAmount;
     [SerializeField] private ResourceManager.ResourceType[] acceptedResourceType;
     [SerializeField] private int allowedDeliverers;
+
+    [SerializeField] private Citizen worker;
+
+    private void Start()
+    {
+        JobManager.AddJobSpot(1, this.transform);
+    }
 
 
     public void LoadResource(int amount, ResourceManager.ResourceType resourceType)
@@ -35,7 +43,7 @@ public class Storage : MonoBehaviour, IStorage, IManipulable
 
     }
 
-    public void SetResourcesToHold(ResourceManager.ResourceType[] resourceTypes)
+    public void SetAlowedResources(ResourceManager.ResourceType[] resourceTypes)
     {
 
     }
@@ -48,5 +56,43 @@ public class Storage : MonoBehaviour, IStorage, IManipulable
     public void DestroySelf()
     {
         
+    }
+
+    public void Hire(Citizen citizen)
+    {
+        if (worker == null)
+        {
+            worker = citizen;
+            worker.gameObject.AddComponent<StorageStationOperator>();
+        }        
+        JobManager.RemoveJobSpot(1, transform);
+        print("Worker Hired");
+    }
+
+    public void Fire(Citizen citizen)
+    {
+        if (worker == citizen) worker = null;
+        JobManager.AddJobSpot(1, transform);
+        print("Worker Fired");
+    }
+
+    public bool HasJobSpot()
+    {
+        return worker == null;
+    }
+
+    public Transform GetDeliverySpot()
+    {
+        return deliverySpot;
+    }
+
+    public Transform GetOperatorSpot()
+    {
+        return operatorSpot;
+    }
+
+    private bool HasOperator()
+    {
+        return worker != null;
     }
 }

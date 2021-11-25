@@ -102,8 +102,22 @@ public class SawMill : MonoBehaviour, IMachine
         return null;
     }
 
-    public LoadStation GetUnloadStation()
+    public UnloadStation GetUnloadStation()
     {
             return null;
+    }
+    public void AddStationsInReach()
+    {
+
+    }
+
+    public void RemoveStationsOutOfReach(Transform station)
+    {
+
+    }
+
+    public void GetStationsInReach(Transform station)
+    {
+
     }
 }

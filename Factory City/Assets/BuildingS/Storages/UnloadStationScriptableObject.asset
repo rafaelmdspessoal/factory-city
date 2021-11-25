@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ee95fe36c94ec3d469416125147f470d, type: 3}
-  m_Name: StorageScriptableObject
+  m_Name: UnloadStationScriptableObject
   m_EditorClassIdentifier: 
-  Name: Storage
-  prefab: {fileID: 248719039782092180, guid: a4a5686a9d18fa34abb89428cd0a015b, type: 3}
-  visual: {fileID: 248719039782092180, guid: 2888706e8818035488fce53912ab41f7, type: 3}
-  dimention: {x: 3.5, y: 2.5, z: 3.5}
-  currentDimention: {x: 1, y: 1, z: 1}
+  Name: Unload Station
+  prefab: {fileID: 1753238997192784299, guid: 6cfdea9c637fa764aad83dfb9a154ba8, type: 3}
+  visual: {fileID: 7282160779765336673, guid: 247dafb502a58cc4892eef4bffd85ad4, type: 3}
+  dimention: {x: 5, y: 3, z: 3}
+  currentDimention: {x: 5, y: 3, z: 3}
   scalableDimentions: {x: 0, y: 0, z: 0}
   currentRotation: {x: 0, y: 0, z: 0}
   buildingRotation: 0

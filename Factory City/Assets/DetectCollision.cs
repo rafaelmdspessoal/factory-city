@@ -4,27 +4,33 @@ using UnityEngine;
 
 public class DetectCollision : MonoBehaviour
 {
-    public bool collided = false;
-    public List<Collider> nearbyColliders = new List<Collider>();
+    [SerializeField] private LayerMask triggerCollisionLayers = new LayerMask();
 
+    public bool collided = false;
+    public List<Transform> nearbyTransforms = new List<Transform>();
 
     private void OnTriggerEnter(Collider collider)
     {
-        nearbyColliders.Add(collider);
+        nearbyTransforms.Add(collider.transform);
+        collided = HasCollided(nearbyTransforms);
     }
 
     private void OnTriggerExit(Collider collider)
     {
-        nearbyColliders.Remove(collider);
+        nearbyTransforms.Remove(collider.transform);
+        collided = HasCollided(nearbyTransforms);
     }
 
-    private void OnCollistionEnter(Collider collider)
+    private bool HasCollided(List<Transform> colliderTransforms)
     {
-        collided = true;
-    }
-
-    private void OnCollistionExit(Collider collider)
-    {
-        collided = false;
+        foreach(Transform colTransform in colliderTransforms)
+        {
+            LayerMask layer = colTransform.gameObject.layer;
+            if (triggerCollisionLayers == (triggerCollisionLayers | (1 << layer)))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

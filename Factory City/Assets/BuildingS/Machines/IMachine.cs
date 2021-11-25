@@ -4,14 +4,14 @@ using UnityEngine;
 
 public interface IMachine 
 {
-    void Hire(Citizen citizen);
-
-    void Fire(Citizen citizen);
-
-    bool HasJobSpot();
-
     LoadStation GetLoadStation();
 
-    LoadStation GetUnloadStation();
+    UnloadStation GetUnloadStation();
+
+    void AddStationsInReach();
+    void RemoveStationsOutOfReach(Transform station);
+
+    void GetStationsInReach(Transform station);
+
 }
 

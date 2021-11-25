@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using CodeMonkey.Utils;
 
 public class Citizen : MonoBehaviour
 {
@@ -17,7 +16,6 @@ public class Citizen : MonoBehaviour
     public int attackDamage;
     public float attackSpeed;
 
-    private Func<bool> HasJob;
 
     private void Awake()
     {
@@ -28,7 +26,13 @@ public class Citizen : MonoBehaviour
     private void Start()
     {
         destinationObj = this.transform;
-        FunctionPeriodic.Create(LookForJob, () => hasJob, 1);
+        PopulationManager.AddCitizen(1, this);
+
+        LookForJob();
+        JobManager.OnJobChanged += delegate (object sender, EventArgs e)
+        {
+            LookForJob();
+        };
     }
 
     private void Update()
@@ -99,7 +103,7 @@ public class Citizen : MonoBehaviour
         {
             hasJob = true;
             Transform jobSpot = JobManager.jobList[0];
-            IMachine job = jobSpot.GetComponent<IMachine>();
+            IHaveWorkers job = jobSpot.GetComponent<IHaveWorkers>();
             job.Hire(this);
             workPlace = jobSpot;
         }
