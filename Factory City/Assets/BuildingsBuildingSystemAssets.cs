@@ -11,7 +11,14 @@ public class BuildingsBuildingSystemAssets : MonoBehaviour
         Instance = this;
     }
 
-    public BuildingsScriptableObjects platform1;
-    public BuildingsScriptableObjects platform2;
+    public BuildingsScriptableObjects platform;
+    public BuildingsScriptableObjects door;
     public BuildingsScriptableObjects column;
+    public BuildingsScriptableObjects wall;
+    public BuildingsScriptableObjects ramp15;
+    public BuildingsScriptableObjects ramp30;
+    public BuildingsScriptableObjects ramp45;
+    public BuildingsScriptableObjects loadStation;
+    public BuildingsScriptableObjects unloadStation;
+    public BuildingsScriptableObjects brikMachine;
 }

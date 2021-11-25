@@ -11,13 +11,14 @@ public class CharacterStates : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-        state = State.NotBuilding;
+        state = State.Building;
     }
 
     public enum State
     {
         Building,
-        NotBuilding,
+        Demolishing,
+        Harvesting,
     };
 
     public State GetNextState()
@@ -25,16 +26,17 @@ public class CharacterStates : MonoBehaviour
         switch (state)
         {
             default:
-                BuildingSystem.Instance.UnsetSelectedObject();
-                print("not building");
-                return State.NotBuilding;
             case State.Building:
                 BuildingSystem.Instance.UnsetSelectedObject();
-                print("not building");
-                return State.NotBuilding;
-            case State.NotBuilding:
+                print("Demolishing");
+                return State.Demolishing;
+            case State.Demolishing:
                 BuildingSystem.Instance.UnsetSelectedObject();
-                print("building");
+                print("Harvesting");
+                return State.Harvesting;
+            case State.Harvesting:
+                BuildingSystem.Instance.UnsetSelectedObject();
+                print("Building");
                 return State.Building;
         }
     }

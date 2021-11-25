@@ -5,49 +5,91 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "BuildingsScriptableObjects", menuName = "ScriptableObjects/BuildingsScriptableObjects")]
 public class BuildingsScriptableObjects : ScriptableObject
 {
+    public string Name;
     public Transform prefab;
     public Transform visual;
     public Vector3 dimention;
     public Vector3 currentDimention;
-    public string columnName;
+    public Vector3 scalableDimentions;
+    public Vector3 currentRotation;
     public BuildingRotation buildingRotation;
+    public BuildingScale buildingScale;
+    public Color cantBuildColor;
+    public Color visualColor;
 
+    void Start()
+    {
+        buildingRotation = BuildingRotation.Zero;
+        buildingScale = BuildingScale.One;
+        currentDimention = dimention;
+        currentRotation = Vector3.zero;
+        visualColor = visual.GetComponent<Renderer>().material.color;
+    }
 
-    public BuildingRotation GetNextRotation(Transform obj)
+    public BuildingRotation GetNextRotation()
     {
         switch (buildingRotation)
         {
             default:
-                return BuildingRotation.Zero;
             case BuildingRotation.Zero:
-                currentDimention.x = dimention.z;
-                currentDimention.z = dimention.x;
-                obj.rotation = Quaternion.Euler(0, 90, 0);
                 buildingRotation = BuildingRotation.Ninety;
                 return buildingRotation;
             case BuildingRotation.Ninety:
-                currentDimention = dimention;
-                obj.rotation = Quaternion.Euler(0, 180, 0);
                 buildingRotation = BuildingRotation.OneEighty;
                 return buildingRotation;
             case BuildingRotation.OneEighty:
-                currentDimention.x = dimention.z;
-                currentDimention.z = dimention.x;
-                obj.rotation = Quaternion.Euler(0, 270, 0);
                 buildingRotation = BuildingRotation.TwoSeventy;
                 return buildingRotation;
             case BuildingRotation.TwoSeventy:
-                currentDimention = dimention;
-                obj.rotation = Quaternion.identity;
                 buildingRotation = BuildingRotation.Zero;
                 return buildingRotation;
         }
     }
 
-    public Vector3 GetOffset()
+    public BuildingRotation GetNextScale()
     {
-        Vector3 offset = new Vector3(0, dimention.y / 2, 0);
-        return offset;
+        switch (buildingScale)
+        {
+            default:
+            case BuildingScale.Four:
+                buildingScale = BuildingScale.Half;
+                return buildingRotation;
+            case BuildingScale.Half:
+                buildingScale = BuildingScale.One;
+                return buildingRotation;
+            case BuildingScale.One:
+                buildingScale = BuildingScale.Two;
+                return buildingRotation;
+            case BuildingScale.Two:
+                buildingScale = BuildingScale.Three;
+                return buildingRotation;
+            case BuildingScale.Three:
+                buildingScale = BuildingScale.Four;
+                return buildingRotation;
+        }
+    }
+
+    public BuildingRotation GetPreviousScale()
+    {
+        switch (buildingScale)
+        {
+            default:
+            case BuildingScale.Four:
+                buildingScale = BuildingScale.Three;
+                return buildingRotation;
+            case BuildingScale.Three:
+                buildingScale = BuildingScale.Two;
+                return buildingRotation;
+            case BuildingScale.Two:
+                buildingScale = BuildingScale.One;
+                return buildingRotation;
+            case BuildingScale.One:
+                buildingScale = BuildingScale.Half;
+                return buildingRotation;
+            case BuildingScale.Half:
+                buildingScale = BuildingScale.Four;
+                return buildingRotation;
+        }
     }
 
     public enum BuildingRotation
@@ -56,5 +98,14 @@ public class BuildingsScriptableObjects : ScriptableObject
         Ninety,
         OneEighty,
         TwoSeventy,
+    };
+
+    public enum BuildingScale
+    {
+        Half,
+        One,
+        Two,
+        Three,
+        Four,
     };
 }

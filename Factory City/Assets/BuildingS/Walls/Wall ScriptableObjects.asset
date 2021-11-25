@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee95fe36c94ec3d469416125147f470d, type: 3}
+  m_Name: Wall ScriptableObjects
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 3193552020380897287, guid: 088c38374d3006d44a9c1b1d3a6ccf95, type: 3}
+  visual: {fileID: 2694555199145963215, guid: f0439902d3ef2ef4fbc61b43c52f8670, type: 3}
+  dimention: {x: 0.1, y: 1, z: 1}
+  currentDimention: {x: 0.1, y: 2, z: 2}
+  scalableDimentions: {x: 0, y: 1, z: 1}
+  currentRotation: {x: 0, y: 270, z: 0}
+  columnName: Wall
+  buildingRotation: 3
+  buildingScale: 2
+  cantBuildColor: {r: 1, g: 0, b: 0, a: 0}
+  visualColor: {r: 1, g: 1, b: 1, a: 0}
