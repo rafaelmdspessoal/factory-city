@@ -6,23 +6,27 @@ public class ObjectsInReach : MonoBehaviour
 {
     [SerializeField] private int radius;
 
-    public List<Transform> GetResourcesInReach(ResourceManager.ResourceType[] resourceTypes)
+    SphereCollider mCollider;
+
+    private void Start()
     {
-        List<Transform> resources = new List<Transform>();
-        Collider[] colliderArray = Physics.OverlapSphere(transform.position, radius);
-        foreach (Collider collider in colliderArray)
+        mCollider = this.transform.GetComponent<SphereCollider>();
+        mCollider.radius = radius;
+    }
+
+    private void OnTriggerEnter(Collider collider)
+    {
+        if (collider.TryGetComponent<IResource>(out IResource resource))
         {
-            if (collider.TryGetComponent<IResource>(out IResource resource))
-            {
-                foreach(ResourceManager.ResourceType resourceType in resourceTypes)
-                {
-                    if (resource.GetResourceType() == resourceType)
-                    {
-                        resources.Add(collider.transform);
-                    }
-                }
-            }
+            GetComponentInParent<BrickMachine>().AddResourcesInReach(resource.GetResourceType(), collider.transform);         
         }
-        return resources;
+    }
+
+    private void OnTriggerExit(Collider collider)
+    {
+        if (collider.TryGetComponent<IResource>(out IResource resource))
+        {
+            GetComponentInParent<BrickMachine>().RemoveResourcesOutOfReach(resource.GetResourceType(), collider.transform);
+        }
     }
 }

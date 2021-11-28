@@ -2,41 +2,82 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Storage : MonoBehaviour, IStorage, IManipulable, IHaveWorkers
+public class Storage : MonoBehaviour, IStorage, IManipulable
 {
     [SerializeField] private Transform deliverySpot;
     [SerializeField] private Transform operatorSpot;
+    [SerializeField] private Transform loadSpot;
 
     [SerializeField] private int maxResourceAmount;
-    [SerializeField] private int resourceAmount;
     [SerializeField] private ResourceManager.ResourceType[] acceptedResourceType;
+    [SerializeField] private ResourcesScriptableObject[] storedResourceObjects;
     [SerializeField] private int allowedDeliverers;
 
-    [SerializeField] private Citizen worker;
+    [SerializeField] public Citizen worker;
 
-    private void Start()
+    [SerializeField] private Dictionary<ResourceManager.ResourceType, int> resourceAmountDictionary;
+
+    private void Awake()
     {
-        JobManager.AddJobSpot(1, this.transform);
+        resourceAmountDictionary = new Dictionary<ResourceManager.ResourceType, int>();
+        foreach (ResourceManager.ResourceType resourceType in System.Enum.GetValues(typeof(ResourceManager.ResourceType)))
+        {
+            resourceAmountDictionary[resourceType] = 0;
+        }
     }
 
 
-    public void LoadResource(int amount, ResourceManager.ResourceType resourceType)
+    public ResourceManager.ResourceType[] GetAcceptedResourceTypes()
     {
+        return acceptedResourceType;
+    }
+
+    public ResourcesScriptableObject[] GetStoredResourceObjects()
+    {
+        return storedResourceObjects;
+    }
+
+    public int AddResourceAmount(ResourceManager.ResourceType resourceType, int amount)
+    {
+        int resourceAmount = GetResourceAmout(resourceType);
         if (resourceAmount + amount <= maxResourceAmount)
         {
-            resourceAmount += amount;
+            resourceAmountDictionary[resourceType] += amount;
             ResourceManager.AddResourceAmount(ResourceManager.ResourceType.Log, amount);
+            return 0;
+        }
+        else
+        {
+            int remainingResourcesSlot = resourceAmount - amount;
+            resourceAmountDictionary[resourceType] += remainingResourcesSlot;
+            ResourceManager.RemoveResourceAmount(ResourceManager.ResourceType.Log, remainingResourcesSlot);
+            return amount -remainingResourcesSlot;
         }
     }
 
-    public void UnloadResource(int amount, ResourceManager.ResourceType resourceType)
+    public int RemoveResourceAmount(ResourceManager.ResourceType resourceType, int amount)
     {
-        if (resourceAmount + amount >= 0)
+        int resourceAmount = GetResourceAmout(resourceType);
+        if (resourceAmount - amount > 0)
         {
-            resourceAmount -= amount;
+            resourceAmountDictionary[resourceType] -= amount;
             ResourceManager.RemoveResourceAmount(ResourceManager.ResourceType.Log, amount);
+            return amount;
+        }
+        else
+        {
+            int remainingResources = resourceAmount;
+            resourceAmountDictionary[resourceType] -= remainingResources;
+            ResourceManager.RemoveResourceAmount(ResourceManager.ResourceType.Log, remainingResources);
+            return remainingResources;
         }
     }
+
+    public int GetResourceAmout(ResourceManager.ResourceType resourceType)
+    {
+        return resourceAmountDictionary[resourceType];
+    }
+
 
     public void SetMaxResourceAmount(int amount)
     {
@@ -58,23 +99,7 @@ public class Storage : MonoBehaviour, IStorage, IManipulable, IHaveWorkers
         
     }
 
-    public void Hire(Citizen citizen)
-    {
-        if (worker == null)
-        {
-            worker = citizen;
-            worker.gameObject.AddComponent<StorageStationOperator>();
-        }        
-        JobManager.RemoveJobSpot(1, transform);
-        print("Worker Hired");
-    }
-
-    public void Fire(Citizen citizen)
-    {
-        if (worker == citizen) worker = null;
-        JobManager.AddJobSpot(1, transform);
-        print("Worker Fired");
-    }
+    
 
     public bool HasJobSpot()
     {
@@ -84,6 +109,11 @@ public class Storage : MonoBehaviour, IStorage, IManipulable, IHaveWorkers
     public Transform GetDeliverySpot()
     {
         return deliverySpot;
+    }
+
+    public Transform GetLoadSpot()
+    {
+        return loadSpot;
     }
 
     public Transform GetOperatorSpot()

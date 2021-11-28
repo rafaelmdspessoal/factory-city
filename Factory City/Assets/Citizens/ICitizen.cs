@@ -1,18 +1,11 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ICitizen : MonoBehaviour
+public interface ICitizen
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    bool IsIdle();
+    bool HasReachedDestination();
+    public Transform GetWorkPlace();
+    void MoveTo(Transform destination, Action onArrivedAtPosition);
 }

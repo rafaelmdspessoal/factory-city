@@ -192,8 +192,7 @@ public class Lumberjack : MonoBehaviour, IHarvestResource
         {
             print("Logs delivered");
             Storage storage = deliveryStorage.GetComponent<Storage>();
-            storage.LoadResource(resourceAmount, ResourceManager.ResourceType.Log);
-            resourceAmount = 0;
+            resourceAmount = storage.AddResourceAmount(ResourceManager.ResourceType.Log, resourceAmount);
             currentState = State.LookingForTree;
         }
     }

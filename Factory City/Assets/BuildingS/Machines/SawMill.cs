@@ -120,4 +120,26 @@ public class SawMill : MonoBehaviour, IMachine
     {
 
     }
+    public List<Transform> GetResourcesInReach(ResourceManager.ResourceType resourceType)
+    {
+        return null;
+    }
+    public void RemoveResourcesOutOfReach(ResourceManager.ResourceType resourceType, Transform resorceTransform)
+    {
+
+    }
+    public int AddResourceAmount(ResourceManager.ResourceType resourceType, int amount)
+    {
+        return 0;
+    }
+
+    public int RemoveResourceAmount(ResourceManager.ResourceType resourceType, int amount)
+    {
+        return 0;
+    }
+
+    public int GetResourceAmout(ResourceManager.ResourceType resourceType)
+    {
+        return 0;
+    }
 }
