@@ -4,9 +4,11 @@ using UnityEngine;
 
 public interface IStorage 
 {
-    void LoadResource(int amount, ResourceManager.ResourceType resourceType);
+    int AddResourceAmount(ResourceManager.ResourceType resourceType, int amount);
 
-    void UnloadResource(int amount, ResourceManager.ResourceType resourceType);
+    int RemoveResourceAmount(ResourceManager.ResourceType resourceType, int amount);
+
+    int GetResourceAmout(ResourceManager.ResourceType resourceType);
 
     void SetMaxResourceAmount(int amount);
 

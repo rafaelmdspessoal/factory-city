@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,7 @@ public class BuildingSystem : MonoBehaviour
     public static BuildingSystem Instance { get; private set; }
 
     [SerializeField] private LayerMask mouseColliderLayerMask = new LayerMask();
+    [SerializeField] private float snap;
 
     private BuildingsScriptableObjects buildingScriptableObject;
 
@@ -17,9 +19,9 @@ public class BuildingSystem : MonoBehaviour
     private Vector3 mousePos = Vector3.zero;
 
     private bool canBuild;
+    private int[] layersNotToBuildIn;
 
-
-    void Awake()
+   void Awake()
     {
         Instance = this;
     }
@@ -68,11 +70,7 @@ public class BuildingSystem : MonoBehaviour
 
                 if (layer == 9)
                 {
-                    visualsPos = new Vector3(
-                        mousePos.x,
-                        buildingScriptableObject.currentDimention.y / 2,
-                        mousePos.z
-                    );
+                    GetPositionToBuildMachines();
                 }
 
                 switch (BuildingTypes.Instance.buildingType)
@@ -165,10 +163,13 @@ public class BuildingSystem : MonoBehaviour
                         }
                         break;
                     case BuildingTypes.BuildingType.Machines:
-                        if (layer != 7 && layer != 9 && layer != 11 && layer != 12 && layer != 13 && layer != 14 && layer != 15)
+                        layersNotToBuildIn = new int[] { 1, 2, 3, 4, 5, 6, 8, 10, 11, 12, 13, 14 };
+                        NotBuildableLayer(layersNotToBuildIn, layer.value);
+
+                        // Platform
+                        if (layer == 7)
                         {
-                            canBuild = false;
-                            visual.GetComponent<Renderer>().material.color = buildingScriptableObject.cantBuildColor;
+                            GetPositionToBuildMachines();
                         }
                         
                         if (canBuild)
@@ -190,14 +191,31 @@ public class BuildingSystem : MonoBehaviour
                         }
                         break;
                     case BuildingTypes.BuildingType.Storages:
-                        if (layer != 7 && layer != 9 && layer != 11 && layer != 12)
-                        {
-                            canBuild = false;
-                            visual.GetComponent<Renderer>().material.color = buildingScriptableObject.cantBuildColor;
-                        }
-                        else
-                        {
+                        layersNotToBuildIn = new int[] { 1, 2, 3, 4, 5, 6, 8, 10, 11, 12, 13, 14 };
+                        NotBuildableLayer(layersNotToBuildIn, layer.value);
 
+                        // Platform
+                        if (layer == 7)
+                        {
+                            GetPositionToBuildMachines();
+                        }
+
+                        if (canBuild)
+                        {
+                            DetectCollision detectCollision = visual.GetComponentInChildren<DetectCollision>();
+                            foreach (Transform objTransform in detectCollision.nearbyTransforms)
+                            {
+                                if (objTransform.TryGetComponent<LoadStation>(out LoadStation loadStation))
+                                {
+                                    visual.GetComponent<Renderer>().material.color = Color.green;
+                                    break;
+                                }
+                                else if (objTransform.TryGetComponent<UnloadStation>(out UnloadStation unloadStation))
+                                {
+                                    visual.GetComponent<Renderer>().material.color = Color.blue;
+                                    break;
+                                }
+                            }
                         }
                         break;
                 }
@@ -227,6 +245,23 @@ public class BuildingSystem : MonoBehaviour
             }
         }
        
+    }
+
+    private void GetPositionToBuildMachines()
+    {
+        if (Mathf.Abs(mousePos.x) >= Mathf.Abs(visualsPos.x + snap) ||
+            Mathf.Abs(mousePos.x) <= Mathf.Abs(visualsPos.x - snap)
+            )
+        {
+            visualsPos.x = Mathf.Round(mousePos.x * 10f) / 10f;
+        }
+        if (Mathf.Abs(mousePos.z) >= Mathf.Abs(visualsPos.z + snap) ||
+            Mathf.Abs(mousePos.z) <= Mathf.Abs(visualsPos.z - snap)
+            )
+        {
+            visualsPos.z = Mathf.Round(mousePos.z * 10f) / 10f;
+        }
+        visualsPos.y = mousePos.y + buildingScriptableObject.currentDimention.y / 2;
     }
 
     private Vector3 GetColumnPositionToBuildPlatform(Transform referenceObject, Vector3 mousePosition)
@@ -715,11 +750,22 @@ public class BuildingSystem : MonoBehaviour
     private bool CanBuild(Transform ghostObject)
     {
         DetectCollision collision = ghostObject.GetChild(0).GetComponent<DetectCollision>();
-        print(collision.collided);
         if (collision.collided)
         {
             return false;
         }
         return true;
+    }
+
+    private void NotBuildableLayer(int[] unbuildableLayers, int currentLayer)
+    {
+        foreach (int layer in unbuildableLayers)
+        {
+            if (layer == currentLayer)
+            {
+                canBuild = false;
+                visual.GetComponent<Renderer>().material.color = buildingScriptableObject.cantBuildColor;
+            }
+        }
     }
 }

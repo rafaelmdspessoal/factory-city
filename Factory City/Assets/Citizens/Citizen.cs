@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Citizen : MonoBehaviour
+public class Citizen : MonoBehaviour, ICitizen
 {
     [SerializeField] private int moveSpeed;
     [SerializeField] private Transform workPlace;
@@ -16,16 +16,17 @@ public class Citizen : MonoBehaviour
     public int attackDamage;
     public float attackSpeed;
 
+    public bool reachedDestination;
+    private Action onArrivedAtPosition;
 
     private void Awake()
     {
-        navMeshAgent = GetComponent<NavMeshAgent>();
-        navMeshAgent.speed = moveSpeed;
     }
 
     private void Start()
     {
-        destinationObj = this.transform;
+        navMeshAgent = GetComponent<NavMeshAgent>();
+        navMeshAgent.speed = moveSpeed;
         PopulationManager.AddCitizen(1, this);
 
         LookForJob();
@@ -33,29 +34,12 @@ public class Citizen : MonoBehaviour
         {
             LookForJob();
         };
+        
     }
 
     private void Update()
     {
-        if (!HasDestinationObj()) return;
-        Debug.DrawLine(transform.position, destinationObj.position, Color.red);
-        navMeshAgent.destination = destinationObj.position;
-        
-        if (HasReachedDestination())
-        {
-            
-        }
-        else
-        {
-            if(IsDestinationMoving(destinationObj))
-            {
-                SetMovementSpeed(0);
-            }
-            else
-            {
-                SetMovementSpeed(-1);
-            }
-        }
+        HandleMovement();
     }
 
     private bool IsDestinationMoving(Transform obj)
@@ -67,7 +51,27 @@ public class Citizen : MonoBehaviour
 
     public void SetDestinationObj(Transform destObj)
     {
+        if (navMeshAgent.pathPending) return;
         destinationObj = destObj;
+    }
+
+    private void HandleMovement()
+    {
+        if (!HasReachedDestination())
+        {
+            reachedDestination = false;
+            navMeshAgent.destination = destinationObj.position;
+        }
+        else
+        {
+            reachedDestination = true;
+            if (onArrivedAtPosition != null)
+            {
+                Action tmpAction = onArrivedAtPosition;
+                onArrivedAtPosition = null;
+                tmpAction();
+            }
+        }
     }
 
     public Transform GetWorkPlace()
@@ -87,14 +91,19 @@ public class Citizen : MonoBehaviour
         }
     }
 
-    public bool HasDestinationObj()
+    public bool IsIdle()
     {
-        return destinationObj != null;
+        return destinationObj == null;
     }
 
     public bool HasReachedDestination()
-    {
-        return navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance;
+    {   if (IsIdle()) return true;
+
+        if (Vector3.Distance(destinationObj.position, transform.position) <= navMeshAgent.stoppingDistance + .5f) {
+            destinationObj = null;
+            return true;
+        }
+        return false;
     }
 
     void LookForJob()
@@ -108,4 +117,11 @@ public class Citizen : MonoBehaviour
             workPlace = jobSpot;
         }
     }
+
+    public void MoveTo(Transform destination, Action onArrivedAtPosition)
+    {
+        SetDestinationObj(destination);
+        this.onArrivedAtPosition = onArrivedAtPosition;
+    }
 }
+

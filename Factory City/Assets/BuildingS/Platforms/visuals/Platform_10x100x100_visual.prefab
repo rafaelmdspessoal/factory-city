@@ -145,7 +145,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   triggerCollisionLayers:
     serializedVersion: 2
-    m_Bits: 64512
+    m_Bits: 64640
   collided: 0
   nearbyTransforms: []
 --- !u!65 &6091253992891043454

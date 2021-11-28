@@ -10,6 +10,7 @@ public class MachineOperator : MonoBehaviour
 
     void Start()
     {
+        transform.GetComponent<MeshRenderer>().material.color = Color.green;
         citizen = transform.GetComponent<Citizen>();
         workPlace = citizen.GetWorkPlace();
         operatorSpot = workPlace.GetComponent<BrickMachine>().GetOperatorSpot();

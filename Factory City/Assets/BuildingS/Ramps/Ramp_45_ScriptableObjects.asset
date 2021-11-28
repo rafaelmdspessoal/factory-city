@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee95fe36c94ec3d469416125147f470d, type: 3}
   m_Name: Ramp_45_ScriptableObjects
   m_EditorClassIdentifier: 
+  Name: Ramp 45
   prefab: {fileID: 6587372947993122674, guid: 6184f41fbd2273c46827ecae27976207, type: 3}
   visual: {fileID: 1876042479358675573, guid: 67d7c63eb0aadd643942410cda2be5fd, type: 3}
   dimention: {x: 1, y: 1, z: 1}
   currentDimention: {x: 1, y: 1, z: 1}
   scalableDimentions: {x: 0, y: 0, z: 1}
   currentRotation: {x: 0, y: 0, z: 0}
-  columnName: Ramp 45
   buildingRotation: 2
   buildingScale: 0
   cantBuildColor: {r: 1, g: 0, b: 0, a: 0}
