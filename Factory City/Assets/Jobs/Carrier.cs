@@ -4,19 +4,22 @@ using UnityEngine;
 
 public class Carrier : MonoBehaviour
 {
-    [SerializeField] private ResourceManager.ResourceType resourceType;
+    [SerializeField] private Citizen citizen;
+
+    [SerializeField] private Transform workPlaceTransform;
     [SerializeField] private Transform carrierSpot;
-    [SerializeField] private float timeToLoadResource = 1f;
-    [SerializeField] private LoadStation loadStation;
-    [SerializeField] private UnloadStation unloadstation;
-    [SerializeField] private int maxResourceAmount = 2;
-    [SerializeField] private int resourceAmount;
+
+    [SerializeField] private float timeToLoadUnloadResource = 1f;
+    [SerializeField] private float elapseTimeToAction = 0;
+
+    [SerializeField] private int maxResourceAmount = 1;
+
+    [SerializeField] private ResourceItem resourcesCarried;
+    [SerializeField] private ResourceItem resourceToCarry;
+
     [SerializeField] private State state;
 
-    private BrickMachine workPlace;
-    private Citizen citizen;
-
-    public event EventHandler OnResourceDelivered;
+    private IMachine workPlace;
 
     private enum State
     {
@@ -32,161 +35,162 @@ public class Carrier : MonoBehaviour
 
     void Start()
     {
-        transform.GetComponent<MeshRenderer>().material.color = Color.yellow;
         state = State.Idle;
+        transform.GetComponent<MeshRenderer>().material.color = Color.yellow;
         citizen = transform.GetComponent<Citizen>();
-        workPlace = citizen.GetWorkPlace().GetComponent<BrickMachine>();
-        loadStation = workPlace.GetLoadStation();
-        unloadstation = workPlace.GetUnloadStation();
-        carrierSpot = workPlace.GetComponent<BrickMachine>().GetCarrierSpot();
+
+        workPlaceTransform = citizen.GetWorkPlace();
+        workPlace = workPlaceTransform.GetComponent<IMachine>();
+
+        carrierSpot = workPlace.GetCarrierSpot();
         citizen.SetDestinationObj(carrierSpot);
     }
 
     void Update()
     {
         if (!HasResourceToCarry()) return;
+
         switch (state)
         {
             case State.Idle:
-                state = State.MovingToLoadStation;
+                resourceToCarry = workPlace.GetItemToDeliver();
+                state = State.MovingToMachine;
+                if (resourceToCarry == null || resourceToCarry.amount == 0)
+                {
+                    resourceToCarry = workPlace.GetItemToPickup();
+                    state = State.MovingToLoadStation;
+                }
+                if (resourceToCarry == null || resourceToCarry.amount == 0)
+                {
+                    state = State.Idle;
+                    Debug.LogError("No item to carry");
+                    break;
+                }
                 break;
             case State.MovingToLoadStation:
                 if (citizen.IsIdle())
                 {
-                    citizen.MoveTo(loadStation.GetLoadSpot(), () =>
+                    citizen.MoveTo(workPlace.GetLoadStation().GetLoadSpot(), () =>
                     {
                         state = State.PickingUpResources;
-                    });
+                    }, 1f);
                 }
                 break;
             case State.PickingUpResources:
                 if (citizen.IsIdle())
                 {
-                    if (IsInventoryFull())
+                    if (resourceToCarry == null)
                     {
-                        state = State.MovingToMachine;
+                        state = State.Idle;
+                        break;
                     }
-                    else
+                    PickUpResource(workPlace.GetLoadStation().GetLoadSpot().position, () =>
                     {
-                        PickUpResource(loadStation.GetLoadSpot().position, () =>
+                        elapseTimeToAction += Time.deltaTime;
+                        if (elapseTimeToAction >= timeToLoadUnloadResource)
                         {
-                            timeToLoadResource -= Time.deltaTime;
-                            if (timeToLoadResource <= 0)
+                            if (!IsInventoryFull())
                             {
-                                resourceAmount += loadStation.RemoveResourceAmount(resourceType, maxResourceAmount - resourceAmount);
-                                timeToLoadResource = 1;
+                                resourcesCarried = resourceToCarry;
+                                workPlace.GetLoadStation().RemoveResourceItem(resourceToCarry);
+                                resourceToCarry = null;
                             }
-                        });
-                    }
+                            state = State.MovingToMachine;
+                            elapseTimeToAction = 0;
+                        }
+                    });
                 }
                 break;
             case State.MovingToMachine:
                 if (citizen.IsIdle())
                 {
-                    citizen.MoveTo(workPlace.GetCarrierSpot(), () =>
+                    citizen.MoveTo(carrierSpot, () =>
                     {
-                        foreach(ResourceManager.ResourceType type in workPlace.GetAcceptedResourceTypes())
+                        if (resourcesCarried == null)
                         {
-                            if (resourceType == type)
-                            {
-                                state = State.DeliveringResources;
-                                return;
-                            }                                
+                            state = State.PickingUpCraftedResources;
+                            return;
                         }
-                        foreach (ResourceManager.ResourceType type in workPlace.GetCraftedResourceTypes())
-                        {
-                            if (resourceType == type)
-                            {
-                                state = State.PickingUpCraftedResources;
-                                return;
-                            }
-                        }
-                    });
+                        state = State.DeliveringResources;
+                        return;
+                    }, 1f);
                 }
                 break;
             case State.DeliveringResources:
                 if (citizen.IsIdle())
                 {
-                    if (resourceAmount <= 0)
+                    if (resourcesCarried == null)
                     {
                         state = State.Idle;
+                        break;
                     }
-                    else
+                    DeliverResource(carrierSpot.position, () =>
                     {
-                        DeliverResource(workPlace.GetCarrierSpot().position, () =>
+                        elapseTimeToAction += Time.deltaTime;
+                        if (elapseTimeToAction >= timeToLoadUnloadResource)
                         {
-                            timeToLoadResource -= Time.deltaTime;
-                            if (timeToLoadResource <= 0)
-                            {
-                                resourceAmount = workPlace.AddResourceAmount(resourceType, resourceAmount);
-                                timeToLoadResource = 1;
-                                if (OnResourceDelivered != null)
-                                {
-                                    OnResourceDelivered(this, EventArgs.Empty);
-                                }
-                            }
-                        });
-                    }
+                            workPlace.AddResourceItem(resourcesCarried);
+                            resourcesCarried = null;
+                            state = State.Idle;
+                            elapseTimeToAction = 0;
+                        }
+                    });
                 }
                 break;
             case State.PickingUpCraftedResources:
                 if (citizen.IsIdle())
                 {
-                    if (IsInventoryFull())
+                    if (resourceToCarry == null)
                     {
-                        state = State.MovingToUnloadStation;
+                        state = State.Idle;
+                        break;
                     }
-                    else
+                    PickUpResource(carrierSpot.position, () =>
                     {
-                        PickUpResource(workPlace.GetCarrierSpot().position, () =>
+                        elapseTimeToAction += Time.deltaTime;
+                        if (elapseTimeToAction >= timeToLoadUnloadResource)
                         {
-                            timeToLoadResource -= Time.deltaTime;
-                            if (timeToLoadResource <= 0)
-                            {                                
-                                resourceAmount += workPlace.RemoveResourceAmount(resourceType, maxResourceAmount - resourceAmount);
-                                timeToLoadResource = 1;
-                            }
-                        });
-                    }
+                            resourcesCarried = resourceToCarry;
+                            workPlace.RemoveResourceItem(resourceToCarry);
+                            resourceToCarry = null;
+                            elapseTimeToAction = 0;
+                            state = State.MovingToUnloadStation;
+                        }
+                    });
                 }
                 break;
             case State.MovingToUnloadStation:
                 if (citizen.IsIdle())
                 {
-                    citizen.MoveTo(unloadstation.GetLoadSpot(), () =>
+                    citizen.MoveTo(workPlace.GetUnloadStation().GetLoadSpot(), () =>
                     {
                         state = State.UnloadingResources;
-                    });
+                    }, 1f);
                 }
                 break;
             case State.UnloadingResources:
                 if (citizen.IsIdle())
                 {
-                    if (resourceAmount <= 0)
+                    if (resourcesCarried == null)
                     {
                         state = State.Idle;
+                        break;
                     }
-                    else
+                    DeliverResource(workPlace.GetUnloadStation().GetLoadSpot().position, () =>
                     {
-                        DeliverResource(unloadstation.GetLoadSpot().position, () =>
+                        elapseTimeToAction += Time.deltaTime;
+                        if (elapseTimeToAction >= timeToLoadUnloadResource)
                         {
-                            timeToLoadResource -= Time.deltaTime;
-                            if (timeToLoadResource <= 0)
-                            {
-                                resourceAmount = unloadstation.AddResourceAmount(resourceType, resourceAmount);
-                                timeToLoadResource = 1;
-                                if (OnResourceDelivered != null)
-                                {
-                                    OnResourceDelivered(this, EventArgs.Empty);
-                                }
-                            }
-                        });
-                    }
+                            workPlace.GetUnloadStation().AddResourceItem(resourcesCarried);
+                            resourcesCarried = null;
+                            state = State.Idle;
+                            elapseTimeToAction = 0;
+                        }
+                    });
                 }
                 break;
         }
     }
-
 
     public void PickUpResource(Vector3 lookAtPosition, Action OnResourcedPicked)
     {
@@ -202,32 +206,25 @@ public class Carrier : MonoBehaviour
 
     private bool HasResourceToCarry()
     {
-        if (workPlace.GetResourceAmout(resourceType) == 0 && loadStation.GetResourceAmout(resourceType) == 0 && resourceAmount == 0)
+        if (
+            workPlace.GetUnloadStation().IsInventoryFull() ||
+            workPlace.GetLoadStation().GetResourceAmout() <= 0 
+            )
         {
             return false;
         }
         return true;
     }
 
-    public void GetNeededResource(ResourceManager.ResourceType type)
-    {
-        resourceType = type;
-        state = State.MovingToLoadStation;
-    }
-
-    public void PickupCraftedResources(ResourceManager.ResourceType type)
-    {
-        resourceType = type;
-        state = State.MovingToMachine;
-    }
-
     private bool IsInventoryFull()
     {
-        return resourceAmount >= maxResourceAmount;
-    }
-
-    public int GetMaxInventoryResourceAmount()
-    {
-        return maxResourceAmount;
+        if (resourcesCarried != null)
+        {
+            return resourcesCarried.amount > maxResourceAmount;
+        }
+        else
+        {
+            return false;
+        }
     }
 }

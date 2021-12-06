@@ -4,19 +4,26 @@ using UnityEngine;
 
 public class LoadStationOperator : MonoBehaviour
 {
+    [SerializeField] private Citizen citizen;
+
+    [SerializeField] private Transform fieldOfViewTransform;
+
     [SerializeField] private Transform operatorSpot;
-    [SerializeField] private List<Transform> resourcesToStore;
 
-    [SerializeField] private Transform currentResource;
-    [SerializeField] private int resourceAmount;
+    [SerializeField] private Transform workPlace;
+    [SerializeField] private LoadStation loadStation;
 
-    private ResourceManager.ResourceType resourceType;
+    [SerializeField] private int maxResourceAmount = 1;
+    [SerializeField] private List<ResourceItem> carriedResources;
 
-    [SerializeField] Transform workPlace;
-    private LoadStation loadStagion;
-    private Citizen citizen;
 
     [SerializeField] private State state;
+
+    [SerializeField] private int timeToPickDropMaterialItem = 1;
+    [SerializeField] private float elapseTimeToAction = 0;
+
+    [SerializeField] private Transform resourceToStore;
+
 
     private enum State
     {
@@ -24,17 +31,25 @@ public class LoadStationOperator : MonoBehaviour
         MovingToResource,
         PickingUpResources,
         MovingToStorage,
+        DroppingOffResource,
+    }
+
+    private void Awake()
+    {
+        carriedResources = new List<ResourceItem>();        
     }
 
     void Start()
     {
-        transform.GetComponent<MeshRenderer>().material.color = Color.white;
-        resourcesToStore = new List<Transform>();
         state = State.Idle;
+
+        transform.GetComponent<MeshRenderer>().material.color = Color.white;
         citizen = transform.GetComponent<Citizen>();
         workPlace = citizen.GetWorkPlace();
-        loadStagion = workPlace.GetComponent<LoadStation>();
-        operatorSpot = loadStagion.GetOperatorSpot();
+        fieldOfViewTransform = citizen.GetFieldOfViewTransform();
+
+        loadStation = workPlace.GetComponent<LoadStation>();
+        operatorSpot = loadStation.GetOperatorSpot();
         citizen.SetDestinationObj(operatorSpot);
     }
 
@@ -44,40 +59,37 @@ public class LoadStationOperator : MonoBehaviour
         switch (state)
         {
             case State.Idle:
-                currentResource = GetResourceToStore();
-                resourceType = currentResource.GetComponent<IResource>().GetResourceType();
                 state = State.MovingToResource;
+                resourceToStore = loadStation.GetResourceToStore();
                 break;
             case State.MovingToResource:
                 if (citizen.IsIdle())
                 {
-                    citizen.MoveTo(currentResource, () =>
+                    citizen.MoveTo(resourceToStore, () =>
                     {
                         state = State.PickingUpResources;
-                    });
+                    }, 1f);
                 }
                 break;
             case State.PickingUpResources:
                 if (citizen.IsIdle())
                 {
-                    if (resourceAmount > 0)
+                    if (carriedResources.Count >= maxResourceAmount)
                     {
                         state = State.MovingToStorage;
+                        break;
                     }
                     else
                     {
-                        PickUpResource(currentResource.position, () =>
+                        PickUpResource(resourceToStore.position, () =>
                         {
-                            IResource resource = currentResource.GetComponent<IResource>();
-                            foreach (ResourceManager.ResourceType resourceType in loadStagion.GetAcceptedResourceTypes())
+                            elapseTimeToAction += Time.deltaTime;
+                            if (elapseTimeToAction >= timeToPickDropMaterialItem)
                             {
-                                if (resource.GetResourceType() == resourceType)
-                                {                                    
-                                    resourceAmount = resource.GetResourceAmount(resourceType);
-                                    resourcesToStore.Remove(currentResource.transform);
-                                    Destroy(currentResource.gameObject);
-                                }
-
+                                carriedResources.Add(resourceToStore.GetComponent<ResourceItemObject>().GetMaterialItem());
+                                loadStation.RemoveResouceToStore(resourceToStore);
+                                Destroy(resourceToStore.gameObject);
+                                elapseTimeToAction = 0;
                             }
                         });
                     }
@@ -88,56 +100,52 @@ public class LoadStationOperator : MonoBehaviour
                 {
                     citizen.MoveTo(operatorSpot, () =>
                     {
-                        resourceAmount = loadStagion.AddResourceAmount(resourceType, resourceAmount);
-                        state = State.Idle;
+                        state = State.DroppingOffResource;
+                    }, 1f);
+                }
+                break;
+            case State.DroppingOffResource:
+                if (citizen.IsIdle())
+                {
+                    DropOffResource(operatorSpot.position, () =>
+                    {
+                        elapseTimeToAction += Time.deltaTime;
+                        if (elapseTimeToAction >= timeToPickDropMaterialItem)
+                        {
+                            for (int i = 0; i < carriedResources.Count; i++)
+                            {
+                                loadStation.AddResourceItem(carriedResources[i]);
+                                carriedResources.Remove(carriedResources[i]);
+                            }                            
+                            state = State.Idle;
+                            elapseTimeToAction = 0;
+                        }
                     });
                 }
                 break;
         }
     }
 
-    private Transform GetResourceToStore()
-    {
-        Transform resourceObj = resourcesToStore[0];
-        return resourceObj;
-    }
 
-    public void PickUpResource(Vector3 lookAtPosition, Action onAnimationCompleted)
+
+    public void PickUpResource(Vector3 lookAtPosition, Action OnResourcePicked)
     {
         transform.LookAt(lookAtPosition);
-        // animator.PlayMiningAnimation()
-        onAnimationCompleted.Invoke();
+        OnResourcePicked.Invoke();
+    }
+
+    public void DropOffResource(Vector3 lookAtPosition, Action OnResourceDropped)
+    {
+        transform.LookAt(lookAtPosition);
+        OnResourceDropped.Invoke();
     }
 
     private bool HasResourceToCarry()
     {
-        if (resourceAmount == 0 && resourcesToStore.Count == 0)
+        if (carriedResources.Count == 0 && loadStation.GetResourceToStore() == null)
         {
             return false;
         }
         return true;
-    }
-
-    private void OnTriggerEnter(Collider collider)
-    {
-        if (collider.TryGetComponent<IResource>(out IResource resource))
-        {
-            foreach(ResourceManager.ResourceType resourceType in loadStagion.GetAcceptedResourceTypes())
-            {
-                if (resource.GetResourceType() == resourceType)
-                {
-                    resourcesToStore.Add(collider.transform);
-                }
-
-            }
-        }
-    }
-
-    private void OnTriggerExit(Collider collider)
-    {
-        if (collider.TryGetComponent<IResource>(out IResource resource))
-        {
-            if (resourcesToStore.Contains(collider.transform)) resourcesToStore.Remove(collider.transform);
-        }
     }
 }

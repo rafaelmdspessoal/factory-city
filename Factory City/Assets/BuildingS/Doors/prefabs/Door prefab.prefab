@@ -259,6 +259,7 @@ GameObject:
   - component: {fileID: 5483361896272763186}
   - component: {fileID: 5419006522149336618}
   - component: {fileID: -9060627904204320031}
+  - component: {fileID: 7445980257754237173}
   m_Layer: 12
   m_Name: Door prefab
   m_TagString: Untagged
@@ -373,7 +374,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: 0, z: -0.5}
   m_Axis: {x: 0, y: 1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -30.162, y: 1, z: 10.201}
+  m_ConnectedAnchor: {x: 0, y: 0, z: -0.5}
   m_UseSpring: 1
   m_Spring:
     spring: 10
@@ -422,3 +423,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8198bea60ba450428ad8afccef12e28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &7445980257754237173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5483361896272763197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6eeb5dc026fdf4b488bc7ae0138ab719, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_AgentTypeID: 0
+  m_StartPoint: {x: -0.5, y: -0.95, z: 0}
+  m_EndPoint: {x: 0.5, y: -0.95, z: 0}
+  m_Width: 0.5
+  m_CostModifier: -1
+  m_Bidirectional: 1
+  m_AutoUpdatePosition: 0
+  m_Area: 0

@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class JobManager 
 {
-    public static event EventHandler OnJobChanged;
+    public static event Action OnJobChanged;
     public static int jobAmount;
     public static List<Transform> jobList;
 
@@ -20,14 +20,14 @@ public class JobManager
     {
         jobAmount += amount;
         if (!jobList.Contains(jobSpot)) jobList.Add(jobSpot);
-        if (OnJobChanged != null) OnJobChanged(null, EventArgs.Empty);
+        OnJobChanged?.Invoke();
     }
 
     public static void RemoveJobSpot(int amount, Transform jobSpot)
     {
         jobAmount -= amount;
         if (!jobSpot.GetComponent<IHaveWorkers>().HasJobSpot()) jobList.Remove(jobSpot);
-        if (OnJobChanged != null) OnJobChanged(null, EventArgs.Empty);
+        OnJobChanged?.Invoke();
     }
 
     public static int GetJobAmout()

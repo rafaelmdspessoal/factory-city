@@ -56,6 +56,7 @@ public class BuildingSystem : MonoBehaviour
 
             RotateSelectedObject(buildingScriptableObject, visual);
             ScaleSelectedObject(buildingScriptableObject, visual);
+            print(visual);
             canBuild = CanBuild(visual);
             if (!canBuild)
             {
@@ -67,7 +68,6 @@ public class BuildingSystem : MonoBehaviour
                 mousePos = raycastHit.point;
                 Transform hitTransform = raycastHit.transform;
                 LayerMask layer = raycastHit.transform.gameObject.layer;
-
                 if (layer == 9)
                 {
                     GetPositionToBuildMachines();

@@ -8,19 +8,28 @@ public interface IMachine
 
     UnloadStation GetUnloadStation();
 
-    void AddStationsInReach();
-    void RemoveStationsOutOfReach(Transform station);
+    Transform GetCarrierSpot();
 
-    void GetStationsInReach(Transform station);
+    Transform GetOperatorSpot();
 
-    List<Transform> GetResourcesInReach(ResourceManager.ResourceType resourceType);
+    Transform GetResourceToGather();
 
-    public void RemoveResourcesOutOfReach(ResourceManager.ResourceType resourceType, Transform resorceTransform);
+    bool HasResourceToGather();
 
-    int AddResourceAmount(ResourceManager.ResourceType resourceType, int amount);
+    void RemoveResourceItem(ResourceItem resourceItem);
 
-    int RemoveResourceAmount(ResourceManager.ResourceType resourceType, int amount);
+    void AddResourceItem(ResourceItem resourceItem);
 
-    int GetResourceAmout(ResourceManager.ResourceType resourceType);
+    int GetResourceAmout();
+
+    bool IsInventoryFull();
+
+    ResourceItem GetItemToDeliver();
+
+    ResourceItem GetItemToPickup();
+    
+    void SetRecipe(RecipeScriptableObject recipe);
+
+    void RemoveGatheredResourceFromReach(Transform materialItem);
 }
 

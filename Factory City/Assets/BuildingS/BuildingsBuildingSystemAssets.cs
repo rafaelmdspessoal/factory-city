@@ -21,4 +21,5 @@ public class BuildingsBuildingSystemAssets : MonoBehaviour
     public BuildingsScriptableObjects loadStation;
     public BuildingsScriptableObjects unloadStation;
     public BuildingsScriptableObjects brikMachine;
+    public BuildingsScriptableObjects sawMill;
 }

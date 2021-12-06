@@ -6,12 +6,12 @@ TagManager:
   tags:
   - CinemachineTarget
   - Ground
-  - Tree
   - Storage
   - Machinery
   - Resource
   - Load Station
   - Unload Station
+  - TreePatch
   layers:
   - Default
   - TransparentFX

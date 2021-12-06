@@ -2,127 +2,131 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Storage : MonoBehaviour, IStorage, IManipulable
-{
-    [SerializeField] private Transform deliverySpot;
+public class Storage : MonoBehaviour
+{ 
     [SerializeField] private Transform operatorSpot;
+    [SerializeField] private Transform deliverySpot;
     [SerializeField] private Transform loadSpot;
+    [SerializeField] private Transform fieldOfViewTransform;
 
-    [SerializeField] private int maxResourceAmount;
-    [SerializeField] private ResourceManager.ResourceType[] acceptedResourceType;
-    [SerializeField] private ResourcesScriptableObject[] storedResourceObjects;
+    [SerializeField] private int maxStoredResources = 100;
+    [SerializeField] private List<ResourceItem> storedResourceItems;
     [SerializeField] private int allowedDeliverers;
 
-    [SerializeField] public Citizen worker;
+    [SerializeField] public Citizen storageOperator;
+    [SerializeField] public int maxGatherersNumber;
+    [SerializeField] public List<Citizen> storageGatherers;
 
-    [SerializeField] private Dictionary<ResourceManager.ResourceType, int> resourceAmountDictionary;
 
     private void Awake()
     {
-        resourceAmountDictionary = new Dictionary<ResourceManager.ResourceType, int>();
-        foreach (ResourceManager.ResourceType resourceType in System.Enum.GetValues(typeof(ResourceManager.ResourceType)))
+        storageGatherers = new List<Citizen>();
+        storedResourceItems = new List<ResourceItem>();        
+    }
+
+    public void AddResourceItem(ResourceItem item)
+    {
+        int resourceAmount = GetResourceAmout();
+        if (resourceAmount + item.amount <= maxStoredResources)
         {
-            resourceAmountDictionary[resourceType] = 0;
-        }
-    }
-
-
-    public ResourceManager.ResourceType[] GetAcceptedResourceTypes()
-    {
-        return acceptedResourceType;
-    }
-
-    public ResourcesScriptableObject[] GetStoredResourceObjects()
-    {
-        return storedResourceObjects;
-    }
-
-    public int AddResourceAmount(ResourceManager.ResourceType resourceType, int amount)
-    {
-        int resourceAmount = GetResourceAmout(resourceType);
-        if (resourceAmount + amount <= maxResourceAmount)
-        {
-            resourceAmountDictionary[resourceType] += amount;
-            ResourceManager.AddResourceAmount(ResourceManager.ResourceType.Log, amount);
-            return 0;
+            ResourceItem storedItem = HasResourceInStorage(item);
+            if (storedItem != null)
+            {
+                storedItem.amount += item.amount;
+                ResourceManager.AddResourceAmount(item.resourceScriptableObject, item.amount);
+            }
+            else
+            {
+                Debug.LogError("Item " + item.GetMaterialname() + " not found in Storage");
+            }
         }
         else
         {
-            int remainingResourcesSlot = resourceAmount - amount;
-            resourceAmountDictionary[resourceType] += remainingResourcesSlot;
-            ResourceManager.RemoveResourceAmount(ResourceManager.ResourceType.Log, remainingResourcesSlot);
-            return amount -remainingResourcesSlot;
+            Debug.LogError("Station is full");
+            return;
         }
     }
 
-    public int RemoveResourceAmount(ResourceManager.ResourceType resourceType, int amount)
+    public void RemoveResourceItem(ResourceItem item)
     {
-        int resourceAmount = GetResourceAmout(resourceType);
-        if (resourceAmount - amount > 0)
+        int resourceAmount = GetResourceAmout();
+        if (resourceAmount - item.amount >= 0)
         {
-            resourceAmountDictionary[resourceType] -= amount;
-            ResourceManager.RemoveResourceAmount(ResourceManager.ResourceType.Log, amount);
-            return amount;
+            ResourceItem storedItem = HasResourceInStorage(item);
+            if (storedItem != null)
+            {
+                storedItem.amount -= item.amount;
+                ResourceManager.RemoveResourceAmount(item.resourceScriptableObject, item.amount);
+            }
+            else
+            {
+                Debug.LogError("Item " + item.GetMaterialname() +  " not found in Storage");
+            }
         }
         else
         {
-            int remainingResources = resourceAmount;
-            resourceAmountDictionary[resourceType] -= remainingResources;
-            ResourceManager.RemoveResourceAmount(ResourceManager.ResourceType.Log, remainingResources);
-            return remainingResources;
+            Debug.LogError("Not enough resources");
         }
     }
 
-    public int GetResourceAmout(ResourceManager.ResourceType resourceType)
+    public int GetResourceAmout(ResourceItem item)
     {
-        return resourceAmountDictionary[resourceType];
+        int amount = 0;
+        if (HasResourceInStorage(item) != null) amount += item.amount;
+        return amount;
     }
 
+    public int GetResourceAmout()
+    {
+        int amount = 0;
+        foreach (ResourceItem resourceItem in storedResourceItems)
+        {
+            amount += resourceItem.amount;
+        }
+        return amount;
+    }
 
     public void SetMaxResourceAmount(int amount)
     {
-
+        maxStoredResources = amount;
     }
 
-    public void SetAlowedResources(ResourceManager.ResourceType[] resourceTypes)
+    public void AddNewResource(ResourceItem item)
     {
-
+        if (HasResourceInStorage(item) != null) return;
+        storedResourceItems.Add(CreateNewItemInstance(item));
     }
 
-    public void CreateSelf()
+    private ResourceItem CreateNewItemInstance(ResourceItem item)
     {
-
+        ResourceItem newItem = new ResourceItem();
+        newItem.resourceScriptableObject = item.resourceScriptableObject;
+        newItem.amount = 0;
+        return newItem;
     }
 
-    public void DestroySelf()
+    public ResourceItem HasResourceInStorage(ResourceItem item)
     {
-        
+        if (item == null) return null;
+        for (int i = 0; i < storedResourceItems.Count; i++)
+        {        
+            if (item.resourceScriptableObject == storedResourceItems[i].resourceScriptableObject)
+            {
+                return storedResourceItems[i];
+            }
+        }
+        Debug.LogError("Storage does NOT contain resource: " + item.GetMaterialname());
+        return null;
     }
 
-    
-
-    public bool HasJobSpot()
-    {
-        return worker == null;
-    }
-
-    public Transform GetDeliverySpot()
-    {
-        return deliverySpot;
-    }
-
-    public Transform GetLoadSpot()
-    {
-        return loadSpot;
-    }
-
-    public Transform GetOperatorSpot()
-    {
-        return operatorSpot;
-    }
-
-    private bool HasOperator()
-    {
-        return worker != null;
-    }
+    public bool HasJobSpot() => (!HasOperator() || storageGatherers.Count < maxGatherersNumber);
+    public Transform GetDeliverySpot() => deliverySpot;
+    public Transform GetLoadSpot() => loadSpot;
+    public Transform GetOperatorSpot() => operatorSpot;
+    private bool HasOperator() => storageOperator != null;
+    public bool HasGatherer() => storageGatherers.Count > 0;
+    public int GetGathererNumber() => maxGatherersNumber;
+    public bool HasResources() => GetResourceAmout() > 0;
+    public bool IsInventoryFull() => GetResourceAmout() >= maxStoredResources;
+    public List<ResourceItem> GetStoredResources() => storedResourceItems;
 }

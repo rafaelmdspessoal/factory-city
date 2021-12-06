@@ -6,6 +6,10 @@ using UnityEngine.UI;
 
 public class WindowGamePopulation : MonoBehaviour
 {
+    private void Awake()
+    {
+        PopulationManager.Init();
+    }
     private void Start()
     {
         UpdateJobTextObject();
@@ -16,6 +20,6 @@ public class WindowGamePopulation : MonoBehaviour
     }
     void UpdateJobTextObject()
     {
-        transform.Find("Population").GetComponent<Text>().text = "Population: " + PopulationManager.GetPopulation();
+        transform.Find("Population").GetComponent<Text>().text = "Pop: " + PopulationManager.GetPopulation();
     }
 }
