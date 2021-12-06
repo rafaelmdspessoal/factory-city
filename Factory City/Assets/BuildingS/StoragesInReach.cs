@@ -1,37 +1,34 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class StoragesInReach : MonoBehaviour
 {
-    IMachine machine;
-    private Color originalColor;
-    string load_station = "Load Station";
-    string unload_station = "Unload Station";
+    [SerializeField] private List<Storage> storagesInReach;
+    public event EventHandler OnObjectAdded;
+
+    public List<Storage> GetObjectsInReach()
+    {
+        return storagesInReach;
+    }
 
     private void Start()
     {
-        machine = transform.parent.GetComponent<IMachine>();
-
-        originalColor = transform.parent.GetComponent<MeshRenderer>().material.color;
+        storagesInReach = new List<Storage>();
     }
 
     private void OnTriggerEnter(Collider collider)
     {
-        if (collider.gameObject.CompareTag(load_station) || collider.gameObject.CompareTag(unload_station))
+        if (collider.transform.TryGetComponent<Storage>(out Storage storage))
         {
-            transform.parent.GetComponent<Renderer>().material.color = Color.green;
-            machine.GetStationsInReach(collider.transform);
+            storagesInReach.Add(storage);
+            OnObjectAdded?.Invoke(this, EventArgs.Empty);
         }
-        machine.AddStationsInReach();
     }
 
     private void OnTriggerExit(Collider collider)
     {
-        if (collider.gameObject.CompareTag(load_station) || collider.gameObject.CompareTag(unload_station))
-        {
-            transform.parent.GetComponent<Renderer>().material.color = originalColor;
-            machine.RemoveStationsOutOfReach(collider.transform);
-        }
+        if (collider.transform.TryGetComponent<Storage>(out Storage storage))
+            storagesInReach.Remove(storage);
     }
 }

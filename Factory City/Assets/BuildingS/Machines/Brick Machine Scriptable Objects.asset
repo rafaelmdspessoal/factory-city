@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee95fe36c94ec3d469416125147f470d, type: 3}
+  m_Name: Brick Machine Scriptable Objects
+  m_EditorClassIdentifier: 
+  Name: Brick Machine
+  prefab: {fileID: 2764949947125187360, guid: 81159f84fca37fa48867fca5bc8c0338, type: 3}
+  visual: {fileID: 2764949947125187360, guid: cb9416c29ee6d2b46a081c61c06030c6, type: 3}
+  dimention: {x: 6, y: 3, z: 3}
+  currentDimention: {x: 6, y: 3, z: 3}
+  scalableDimentions: {x: 0, y: 0, z: 0}
+  currentRotation: {x: 0, y: 0, z: 0}
+  buildingRotation: 0
+  buildingScale: 0
+  cantBuildColor: {r: 0.9811321, g: 0, b: 0, a: 0}
+  visualColor: {r: 1, g: 1, b: 1, a: 0}

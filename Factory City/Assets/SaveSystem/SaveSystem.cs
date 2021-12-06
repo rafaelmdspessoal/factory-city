@@ -7,13 +7,6 @@ public class SaveSystem : MonoBehaviour
 {
     private List<ISaveable> saveables = new List<ISaveable>();
 
-    private void Awake()
-    {
-        ResourceManager.Init();
-        JobManager.Init();
-        PopulationManager.Init();
-    }
-
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.F5))

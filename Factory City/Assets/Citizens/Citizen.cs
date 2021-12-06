@@ -3,44 +3,46 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using CodeMonkey.Utils;
 
 public class Citizen : MonoBehaviour, ICitizen
 {
-    [SerializeField] private int moveSpeed;
     [SerializeField] private Transform workPlace;
-
-    private NavMeshAgent navMeshAgent;
     [SerializeField] private Transform destinationObj;
-    private bool hasJob = false;
 
-    public int attackDamage;
-    public float attackSpeed;
+    [SerializeField] private ToolScriptableObject tool;
 
-    public bool reachedDestination;
+    [SerializeField] private int moveSpeed;
+    [SerializeField] private float attackDamage;
+    [SerializeField] private float attackSpeed;
+
+    [SerializeField] private Transform actionArea;
+    [SerializeField] private Transform fieldOfViewTransform;
+
+    private float stoppingDistance = .5f;
     private Action onArrivedAtPosition;
+    private NavMeshAgent navMeshAgent;
 
-    private void Awake()
-    {
-    }
 
     private void Start()
     {
+        attackDamage += tool.attackDamage;
+        attackSpeed += tool.attackSpeed;
+
         navMeshAgent = GetComponent<NavMeshAgent>();
         navMeshAgent.speed = moveSpeed;
-        PopulationManager.AddCitizen(1, this);
 
-        LookForJob();
-        JobManager.OnJobChanged += delegate (object sender, EventArgs e)
-        {
-            LookForJob();
-        };
-        
+        PopulationManager.AddCitizen(1, this);
+        FunctionTimer.Create(LookForJob, 3);
+        JobManager.OnJobChanged += LookForJob;
     }
+
 
     private void Update()
     {
         HandleMovement();
     }
+    public bool IsCitizenMoving() => navMeshAgent.velocity.magnitude > 0;
 
     private bool IsDestinationMoving(Transform obj)
     {
@@ -59,12 +61,10 @@ public class Citizen : MonoBehaviour, ICitizen
     {
         if (!HasReachedDestination())
         {
-            reachedDestination = false;
             navMeshAgent.destination = destinationObj.position;
         }
         else
         {
-            reachedDestination = true;
             if (onArrivedAtPosition != null)
             {
                 Action tmpAction = onArrivedAtPosition;
@@ -74,32 +74,14 @@ public class Citizen : MonoBehaviour, ICitizen
         }
     }
 
-    public Transform GetWorkPlace()
-    {
-        return workPlace;
-    }
-
-    public void SetMovementSpeed(float speed)
-    {
-        if (speed < 0)
-        {
-            navMeshAgent.speed = moveSpeed;
-        }
-        else
-        {
-            navMeshAgent.speed = speed;
-        }
-    }
-
-    public bool IsIdle()
-    {
-        return destinationObj == null;
-    }
-
+    public Transform GetWorkPlace() => workPlace;
+    public bool IsIdle() => destinationObj == null;
     public bool HasReachedDestination()
-    {   if (IsIdle()) return true;
 
-        if (Vector3.Distance(destinationObj.position, transform.position) <= navMeshAgent.stoppingDistance + .5f) {
+    {   if (IsIdle()) return true;
+            
+        Debug.DrawLine(destinationObj.position, transform.position);
+        if (Vector3.Distance(destinationObj.position, transform.position) <= navMeshAgent.stoppingDistance + stoppingDistance) {
             destinationObj = null;
             return true;
         }
@@ -108,20 +90,29 @@ public class Citizen : MonoBehaviour, ICitizen
 
     void LookForJob()
     {
-        if (JobManager.jobList.Count > 0 && !hasJob)
+        print("Looking For Job");        
+        if (JobManager.jobList.Count > 0 && workPlace == null)
         {
-            hasJob = true;
-            Transform jobSpot = JobManager.jobList[0];
-            IHaveWorkers job = jobSpot.GetComponent<IHaveWorkers>();
+            workPlace = JobManager.jobList[0];
+            IHaveWorkers job = workPlace.GetComponent<IHaveWorkers>();
             job.Hire(this);
-            workPlace = jobSpot;
+            JobManager.OnJobChanged -= LookForJob;
         }
     }
 
-    public void MoveTo(Transform destination, Action onArrivedAtPosition)
+    public void MoveTo(Transform destination, Action onArrivedAtPosition, float stoppingDistance)
     {
+        this.stoppingDistance = stoppingDistance;
         SetDestinationObj(destination);
         this.onArrivedAtPosition = onArrivedAtPosition;
     }
+
+    public Transform GetActionArea() => actionArea;
+
+    public Transform GetFieldOfViewTransform() => fieldOfViewTransform;
+
+    public float GetAttackDamage() => attackDamage + UnityEngine.Random.Range(-attackDamage / 2, attackDamage / 2);
+
+    public float GetAttackSpeed() => attackSpeed;
 }
 

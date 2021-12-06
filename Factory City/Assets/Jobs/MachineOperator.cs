@@ -13,7 +13,7 @@ public class MachineOperator : MonoBehaviour
         transform.GetComponent<MeshRenderer>().material.color = Color.green;
         citizen = transform.GetComponent<Citizen>();
         workPlace = citizen.GetWorkPlace();
-        operatorSpot = workPlace.GetComponent<BrickMachine>().GetOperatorSpot();
+        operatorSpot = workPlace.GetComponent<IMachine>().GetOperatorSpot();
         citizen.SetDestinationObj(operatorSpot);
     }
 

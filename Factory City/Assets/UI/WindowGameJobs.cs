@@ -6,13 +6,14 @@ using UnityEngine.UI;
 
 public class WindowGameJobs : MonoBehaviour
 {
-    private void Start()
+    private void Awake()
     {
+        JobManager.Init();
+    }
+    private void Start()
+    {        
         UpdateJobTextObject();
-        JobManager.OnJobChanged += delegate (object sender, EventArgs e)
-        {
-            UpdateJobTextObject();
-        };
+        JobManager.OnJobChanged += UpdateJobTextObject;
     }
     void UpdateJobTextObject()
     {

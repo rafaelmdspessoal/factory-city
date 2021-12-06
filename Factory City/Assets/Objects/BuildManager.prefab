@@ -51,7 +51,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mouseColliderLayerMask:
     serializedVersion: 2
-    m_Bits: 8119
+    m_Bits: 65462
+  snap: 1
 --- !u!114 &1002231477693195594
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -71,6 +72,10 @@ MonoBehaviour:
   ramp15: {fileID: 11400000, guid: 9d92f585a55b28a4286c57624f39b09d, type: 2}
   ramp30: {fileID: 11400000, guid: 80ae69a748f272f41959a30a510e8564, type: 2}
   ramp45: {fileID: 11400000, guid: 4c42e9faa1bda34489ff52e8d93ef4c2, type: 2}
+  loadStation: {fileID: 11400000, guid: 38fa8383fe6af144ea64552c99b1add8, type: 2}
+  unloadStation: {fileID: 11400000, guid: 43c24e45665faec4787411eb9ecb345b, type: 2}
+  brikMachine: {fileID: 11400000, guid: 220239f00e71b4b4d947b3d6b5428615, type: 2}
+  sawMill: {fileID: 11400000, guid: c89f571568dfe4147a84ce961489fdf1, type: 2}
 --- !u!114 &1002231477693195592
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -96,7 +101,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b34b37bf2c8758049be65e94777910c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  state: 1
+  state: 0
 --- !u!114 &1002231477693195595
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -131,6 +136,10 @@ MonoBehaviour:
   wallsBtn:
   - {fileID: 0}
   rampsBtn:
+  - {fileID: 0}
+  machinesBtn:
+  - {fileID: 0}
+  storagesBtn:
   - {fileID: 0}
 --- !u!114 &1002231477693195596
 MonoBehaviour:

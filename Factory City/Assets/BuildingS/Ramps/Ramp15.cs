@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
+
 public class Ramp15 : MonoBehaviour, IManipulable
 {
     public void DestroySelf()

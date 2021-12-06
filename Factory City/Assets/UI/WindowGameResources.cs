@@ -6,8 +6,11 @@ using UnityEngine.UI;
 
 public class WindowGameResources : MonoBehaviour
 {
+    [SerializeField] private List<ResourceScriptableObject> resourceList = new List<ResourceScriptableObject>();
+
     private void Start()
     {
+        ResourceManager.Init();
         UpdateResourceTextObject();
         ResourceManager.OnResourceAmountChanged += delegate (object sender, EventArgs e)
         {
@@ -16,6 +19,11 @@ public class WindowGameResources : MonoBehaviour
     }
     void UpdateResourceTextObject()
     {
-        transform.Find("LogAmount").GetComponent<Text>().text = "Logs: " + ResourceManager.GetResourceAmout(ResourceManager.ResourceType.Log);
+        for (int i = 0; i < resourceList.Count; i++)
+        {
+            transform.Find(resourceList[i].name).GetComponent<Text>().text = resourceList[i].name + ": " + ResourceManager.GetResourceAmout(resourceList[i]);
+        }
     }
+
+    public List<ResourceScriptableObject> GetResourceList() => resourceList;
 }

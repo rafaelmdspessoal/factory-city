@@ -10,5 +10,9 @@ public class SelectMachineTypeUI : MonoBehaviour
         {
             BuildingSystem.Instance.SetSelectedObject(BuildingsBuildingSystemAssets.Instance.brikMachine);
         };
+        transform.Find("sawMillBtn").GetComponent<Button_UI>().ClickFunc = () =>
+        {
+            BuildingSystem.Instance.SetSelectedObject(BuildingsBuildingSystemAssets.Instance.sawMill);
+        };
     }
 }
